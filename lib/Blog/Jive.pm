@@ -25,6 +25,7 @@ use Moose;
 
 use Blog::Jive::Kit;
 use Blog::Jive::Journal;
+use Blog::Jive::Assets;
 
 use Path::Mapper;
 use DBICx::Modeler;
