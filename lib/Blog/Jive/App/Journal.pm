@@ -54,14 +54,15 @@ sub find {
     my ($folder, $title) = folder_title @criteria;
 
     my ($search, $post, $count);
-    $search = $journal->posts(
-        [ 
-            { title => $criteria },
-            { folder => $folder, title => $title },
-            { uuid => { -like => "$criteria%" } },
-        ],
-        {}
-    );
+    $search = $journal->schema->search({ id => { -like => "$criteria%" } });
+#    $search = $journal->posts(
+#        [ 
+#            { title => $criteria },
+#            { folder => $folder, title => $title },
+#            { uuid => { -like => "$criteria%" } },
+#        ],
+#        {}
+#    );
 
     $count = $search->count;
     ($post) = $search->slice(0, 0) if 1 == $count;
