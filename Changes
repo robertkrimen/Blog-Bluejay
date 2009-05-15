@@ -1,0 +1,11 @@
+TODO:
+    - Upgrade strategy:
+        Blog::Jive::Upgrade
+        Blog::Jive::Upgrade::App
+            backup/copy
+            upgrade (on copy)
+            test (on copy)
+            commit (move copy to production)
+        Blog::Jive::Upgrade::v3::From::{v1,v2}
+        ~/t/upgrade/v3/*.t
+        New schema table: schema_version (use DBIx::Class::Versioned for this?)
