@@ -12,12 +12,13 @@ use jQuery::Loader;
 use File::Assets;
 use CatalystXPathCatalog;
 use Blog::Jive;
+use Text::Lorem::More;
 
 has catalog => qw/is ro lazy_build 1/;
 sub _build_catalog {
     my $catalog = CatalystXPathCatalog->new( catalog => <<_END_ );
 /           index.tt.html
-#/journal    journal/home.tt.html
+/mock       mock/index.tt.html
 _END_
     return $catalog;
 }
@@ -40,9 +41,19 @@ sub auto :Private {
     return 1;
 }
 
-sub default :Path {
+sub default :Private {
     my ( $self, $ctx ) = @_;
 
+    $ctx->forward( 'not_found' ) unless $self->catalog->dispatch( $ctx );
+}
+
+sub mock :Local {
+    my ( $self, $ctx ) = @_;
+
+    $ctx->stash(
+        lorem => Text::Lorem::More->new,
+    );
+    
     $ctx->forward( 'not_found' ) unless $self->catalog->dispatch( $ctx );
 }
 
@@ -81,18 +92,18 @@ sub index :Private {
 #    );
 #}
 
-#sub journal_post :Regex('^journal/.*-([A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{12})') {
-#    my ( $self, $ctx ) = @_;
+sub journal_post :Regex('^.*-([A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{12})') {
+    my ( $self, $ctx ) = @_;
 
-#    my $journal = $ctx->stash->{journal};
-#    my ($uuid) = @{ $ctx->request->captures };
+    my $journal = $ctx->stash->{journal};
+    my ($uuid) = @{ $ctx->request->captures };
 
-#    my $post = $journal->post( $uuid );
-#    $ctx->stash(
-#        template => 'journal/post.tt.html',
-#        post => $post,
-#    );
-#}
+    my $post = $journal->post( $uuid );
+    $ctx->stash(
+        template => 'post.tt.html',
+        post => $post,
+    );
+}
 
 sub not_found :Private {
     my ( $self, $ctx ) = @_;

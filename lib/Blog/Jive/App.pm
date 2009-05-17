@@ -28,7 +28,7 @@ my @jive;
     }
 
     sub cabinet {
-        return jive->cabinet;
+        return journal->cabinet;
     }
 }
 
@@ -151,6 +151,10 @@ start [qw/ home=s /], sub {
 on 'setup' => undef, sub {
     my $context = shift;
 
+    print <<_END_ and return if 1;
+Don't overwrite your work, fool!
+_END_
+
     print <<_END_;
 
 I will setup in @{[ journal->kit->home_dir ]}
@@ -161,14 +165,18 @@ _END_
 
         print "\n";
         my $home = jive->home;
+        $home = readlink $home if -l $home;
         File::Find::find( { no_chdir => 1, wanted => sub {
         
             return if $_ eq $home;
+            my $size;
+            $size = -s _ if -f $_;
 
             print "\t", substr $_, 1 + length $home;
+            print " $size" if defined $size;
             print "\n";
 
-        } }, $home  );
+        } }, $home );
         print "\n";
 
     }

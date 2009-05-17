@@ -1,0 +1,71 @@
+body {
+    font-family: Verdana, Arial, sans-serif;
+    background-color: #fff;
+}
+
+a, a:hover, a:active, a:visited {
+    text-decoration: none;
+    font-weight: bold;
+    font-weight: normal;
+    color: #436b95;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.datetime {
+    float: right;
+    color: #666;
+    font-size: 14px;
+    margin-top: 2em;
+}
+
+.datetime-time {
+    float: left;
+    font-size: 16px;
+    margin-left: 10px;
+}
+
+.datetime-weekday {
+    float: left;
+    color: #666;
+    font-size: 24px;
+    text-transform: uppercase;
+}
+
+.datetime-month {
+    margin-bottom: 4px;
+/*    width: 40px;*/
+/*    overflow: hidden;*/
+}
+
+.datetime-month-day {
+    float: left;
+    overflow: hidden;
+    font-weight: bold;
+    background-color: #999;
+    color: #eee;
+    height: 30px;
+/*    width: 45px;*/
+    line-height: 12px;
+    padding: 5px;
+}
+
+.post {
+    color: #333;
+    font-size: 14px;
+}
+
+.post-title {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.post-title a {
+    text-decoration: underline;
+}
+
+.clear {
+    clear: both;
+}

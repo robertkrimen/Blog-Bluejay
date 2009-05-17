@@ -15,6 +15,7 @@ our $VERSION = '0.01';
 
 __PACKAGE__->config(
     name => 'Blog::Jive::Catalyst',
+    root => __PACKAGE__->path_to( qw/assets root/ ),
     'static' => {
         dirs => [qw/ static /],
     },

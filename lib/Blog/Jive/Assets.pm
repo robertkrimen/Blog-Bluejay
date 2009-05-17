@@ -13,9 +13,12 @@ assets/root/static/
 assets/tt/
 _END_
 
+
+# TODO: Warn about SCALAR versus ! ref
+
 include
 
-    'assets/tt/frame.tt.html' => <<'_END_',
+    'assets/tt/frame.tt.html' => \<<'_END_',
 [% yui.include.fonts.grids.reset.base %]
 [% assets.include("static/css/b9.css", -100) %]
 [% assets.include("static/css/b9-home.css", -100) %]
@@ -27,7 +30,6 @@ include
 [% DEFAULT title = default_title %]
 
 [% CLEAR -%]
-[% yo %]
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -58,7 +60,7 @@ include
 </html>
 _END_
 
-    'assets/tt/posts.tt.html' => <<'_END_',
+    'assets/tt/posts.tt.html' => \<<'_END_',
 [% CLEAR -%]
 <div class="pst-list">
 [% FOREACH post = posts %]

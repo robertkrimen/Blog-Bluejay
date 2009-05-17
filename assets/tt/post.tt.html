@@ -1,0 +1,38 @@
+[% DEFAULT title = "$post.title &bull;" %]
+[% CLEAR -%]
+[% WRAPPER frame.tt.html %]
+
+<div class="pst-page yui-ge">
+
+    <div class="yui-u first">
+
+        <div class="pst-post">
+
+            <div class="pst-header">
+
+                <div class="pst-title"><a href="[% post.uri %]">[% post.title %]</a></div>
+
+                <div class="pst-subtitle">
+
+                    <div class="pst-creation">
+
+                        [% post.creation.clone.set_time_zone("UTC").set_time_zone("US/Pacific").strftime("%e %B %Y %l:%M%P") %]
+
+                    </div>
+                    
+                    [% clear %]
+
+                </div>
+
+            </div>
+
+            <div class="pst-body">
+                [% post.body.render %]
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+[% END %]

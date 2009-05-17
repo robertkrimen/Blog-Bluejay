@@ -21,7 +21,7 @@ use Document::TriPart::Cabinet::Storage::Disk;
 has uri => qw/is ro lazy_build 1/;
 sub _build_uri {
     my $self = shift;
-    return $self->jive->kit->uri->child(qw/ journal /);
+    return $self->jive->kit->uri->child(qw//);
 }
 
 has schema_file => qw/is ro lazy_build 1/;
