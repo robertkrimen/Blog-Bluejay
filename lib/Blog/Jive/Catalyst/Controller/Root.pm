@@ -29,8 +29,9 @@ sub auto :Private {
     my $jquery = $stash->{jquery} = jQuery::Loader->new_from_internet;
     my $assets = $stash->{assets} = File::Assets->new( base => { dir =>  $ctx->path_to, uri => $ctx->uri_for, } );
 
-    if ($ctx->request->path =~ m/journal(\/|$)/) {
-        my $jive = Blog::Jive->new;
+#    if ($ctx->request->path =~ m/journal(\/|$)/) {
+    if ( 1 ) {
+        my $jive = Blog::Jive->new( home => $ENV{BLOG_JIVE_HOME} ); # This feels like a hack...
         $jive->kit->uri( URI::PathAbstract->new( $ctx->request->base ) );
         my $journal = $jive->journal;
         $ctx->stash->{journal} = $journal;
@@ -45,42 +46,53 @@ sub default :Path {
     $ctx->forward( 'not_found' ) unless $self->catalog->dispatch( $ctx );
 }
 
-sub journal :Local {
+sub index :Private {
     my ( $self, $ctx ) = @_;
 
     my $journal = $ctx->stash->{journal};
 
     $ctx->stash(
-        template => 'journal/home.tt.html',
+        template => 'posts.tt.html',
         posts => [ $journal->posts ],
     );
 }
 
-sub journal_month :Regex('^journal/(\d{4})/(\d{1,2})') {
-    my ( $self, $ctx ) = @_;
+#sub journal :Local {
+#    my ( $self, $ctx ) = @_;
 
-    my $journal = $ctx->stash->{journal};
-    my ($year, $month) = @{ $ctx->request->captures };
+#    my $journal = $ctx->stash->{journal};
 
-    $month = $journal->month( "$year-$month" );
-    $ctx->stash(
-        template => 'journal/month.tt.html',
-        posts => [ $month->posts ],
-    );
-}
+#    $ctx->stash(
+#        template => 'journal/home.tt.html',
+#        posts => [ $journal->posts ],
+#    );
+#}
 
-sub journal_post :Regex('^journal/.*-([A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{12})') {
-    my ( $self, $ctx ) = @_;
+#sub journal_month :Regex('^journal/(\d{4})/(\d{1,2})') {
+#    my ( $self, $ctx ) = @_;
 
-    my $journal = $ctx->stash->{journal};
-    my ($uuid) = @{ $ctx->request->captures };
+#    my $journal = $ctx->stash->{journal};
+#    my ($year, $month) = @{ $ctx->request->captures };
 
-    my $post = $journal->post( $uuid );
-    $ctx->stash(
-        template => 'journal/post.tt.html',
-        post => $post,
-    );
-}
+#    $month = $journal->month( "$year-$month" );
+#    $ctx->stash(
+#        template => 'journal/month.tt.html',
+#        posts => [ $month->posts ],
+#    );
+#}
+
+#sub journal_post :Regex('^journal/.*-([A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{12})') {
+#    my ( $self, $ctx ) = @_;
+
+#    my $journal = $ctx->stash->{journal};
+#    my ($uuid) = @{ $ctx->request->captures };
+
+#    my $post = $journal->post( $uuid );
+#    $ctx->stash(
+#        template => 'journal/post.tt.html',
+#        post => $post,
+#    );
+#}
 
 sub not_found :Private {
     my ( $self, $ctx ) = @_;

@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+(require Blog::Jive::App)->new->run;
+
+1;

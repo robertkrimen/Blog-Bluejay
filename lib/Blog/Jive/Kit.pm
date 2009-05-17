@@ -11,12 +11,17 @@ with qw/Blog::Jive::Component/;
 
 has path_mapper => qw/is ro lazy_build 1/, handles => [qw/ dir file /];
 sub _build_path_mapper {
-    return Path::Mapper->new( base => '.' );
+    my $self = shift;
+    return Path::Mapper->new( base => $self->jive->_home );
 }
 
 has uri => qw/is rw lazy_build 1/;
 sub _build_uri {
     return URI::PathAbstract->new( 'http://example.com' );
+}
+
+sub home {
+    return shift->home_dir( @_ );
 }
 
 sub home_dir {

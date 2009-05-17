@@ -1,9 +1,0 @@
-#!/usr/bin/perl
-
-use strict;
-use warnings;
-
-use Blog::Jive::App::Journal;
-Blog::Jive::App::Journal->run;
-
-1;
