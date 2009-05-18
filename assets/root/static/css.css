@@ -23,7 +23,7 @@ a:hover {
 .datetime-time {
     float: left;
     font-size: 16px;
-    margin-left: 10px;
+/*    margin-left: 10px;*/
 }
 
 .datetime-weekday {
@@ -33,20 +33,12 @@ a:hover {
     text-transform: uppercase;
 }
 
-.datetime-month {
-    margin-bottom: 4px;
-/*    width: 40px;*/
-/*    overflow: hidden;*/
-}
-
-.datetime-month-day {
+.datetime-month-day-year {
     float: left;
     overflow: hidden;
     font-weight: bold;
     background-color: #999;
     color: #eee;
-    height: 30px;
-/*    width: 45px;*/
     line-height: 12px;
     padding: 5px;
 }
