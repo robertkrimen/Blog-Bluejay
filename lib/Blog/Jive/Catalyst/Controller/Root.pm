@@ -105,6 +105,38 @@ sub journal_post :Regex('^post/.*-([A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-
     );
 }
 
+sub feed_atom :Path('feed/atom') {
+    my ( $self, $ctx ) = @_;
+
+    use XML::Atom::SimpleFeed;
+
+    my $feed = XML::Atom::SimpleFeed->new(
+        title   => '$title',
+        link    => $ctx->uri_for,
+        link    => { rel => 'self', href => $ctx->uri_for( 'feed/atom' ) },
+        author  => '$author',
+    );
+
+    my $journal = $ctx->stash->{journal};
+
+    $ctx->stash(
+        posts => [ $journal->posts ],
+    );
+
+    for my $post ($journal->posts) {
+        $feed->add_entry(
+            title     => $post->title,
+            link      => $post->uri,
+            id        => 'urn:uuid:' . $post->uuid,
+            summary   => '$description',
+            updated   => $post->local_creation,
+        );
+    }
+
+    $ctx->response->content_type( 'application/atom+xml; charset=utf-8' );
+    $ctx->response->body( $feed->as_string );
+}
+
 sub not_found :Private {
     my ( $self, $ctx ) = @_;
     $ctx->response->body( 'Page not found' );
