@@ -92,7 +92,7 @@ sub index :Private {
 #    );
 #}
 
-sub journal_post :Regex('^.*-([A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{12})') {
+sub journal_post :Regex('^post/.*-([A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{12})') {
     my ( $self, $ctx ) = @_;
 
     my $journal = $ctx->stash->{journal};

@@ -15,10 +15,9 @@ a:hover {
 }
 
 .datetime {
-    float: right;
+    float: left;
     color: #666;
     font-size: 14px;
-    margin-top: 2em;
 }
 
 .datetime-time {
@@ -30,7 +29,7 @@ a:hover {
 .datetime-weekday {
     float: left;
     color: #666;
-    font-size: 24px;
+    font-size: 20px;
     text-transform: uppercase;
 }
 
@@ -62,8 +61,23 @@ a:hover {
     font-weight: bold;
 }
 
+.post-header {
+    margin-bottom: 0.5em;
+}
+
 .post-title a {
-    text-decoration: underline;
+}
+
+.post-body pre.code {
+    background: #ffe;
+    border-top: 2px dotted #ccc;
+    border-bottom: 2px dotted #ccc;
+    margin-bottom: 1em;
+    padding: 1em 0.5em;
+/*    color: #000;*/
+}
+.post-separator {
+    margin-top: 2.5em;
 }
 
 .clear {

@@ -1,8 +1,6 @@
-[% yui.include.fonts.grids.reset.base %]
-[% assets.include("static/css/b9.css", -100) %]
-[% assets.include("static/css/b9-home.css", -100) %]
-[% assets.include("static/css/b9-journal.css", -100) %]
-[% assets.include(jquery.uri, -100) %]
+[% assets.include("http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js", -100) %]
+[% assets.include("http://yui.yahooapis.com/combo?2.7.0/build/reset-fonts-grids/reset-fonts-grids.css&2.7.0/build/base/base-min.css", 'css', -100) %]
+[% assets.include("static/css.css", 0) %]
 
 [% DEFAULT title = template.title %]
 [% DEFAULT default_title = "" %]
@@ -14,7 +12,6 @@
 <head>
 <title>[% title %]</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-[% yui.html %]
 [% assets.export("css") %]
 </head>
 <body>

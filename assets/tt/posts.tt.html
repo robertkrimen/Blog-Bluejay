@@ -1,33 +1,40 @@
-[% CLEAR -%]
-<div class="pst-list">
-[% FOREACH post = posts %]
-    <div class="pst-post">
+[% WRAPPER frame.tt.html %]
+    [% FOREACH post = posts %]
+    <div class="yui-gf">
+        <div class="yui-u first">
+            <div class="datetime">
 
-        <div class="pst-header">
+                <div class="datetime-weekday">[% post.local_creation.strftime("%A") %]</div>
 
-            <div class="pst-title"><a href="[% post.uri %]">[% post.title %]</a></div>
+                <div class="clear"></div>
 
-            <div class="pst-subtitle">
-
-                <div class="pst-creation">
-
-                    [% post.created.clone.set_time_zone("UTC").set_time_zone("US/Pacific").strftime("%e %B %Y %l:%M%P") %]
-
+                <div class="datetime-month-day">
+                    <div class="datetime-month">
+                        [% post.local_creation.strftime("%B") %]
+                    </div>
+                    <div class="datetime-day">[% post.local_creation.day %]</div>
                 </div>
-                
-                [% clear %]
+
+                <div class="datetime-time">[% post.local_creation.strftime("%H:%M %P") %]</div>
+
+                <div class="clear"></div>
 
             </div>
-
         </div>
-
-        <div class="pst-body">
-            [% post.body.render %]
+        <div class="yui-u">
+            <div class="post">
+                <div class="post-header">
+                    <div class="post-title"><a href="[% post.uri %]">[% post.title %]</a></div>
+                </div>
+                <div class="post-body">
+                    [% post.body.render %]
+                </div>
+            </div>
         </div>
-
     </div>
     [% IF ! loop.last %]
-    <div class="pst-post-separator"></div>
+    <div class="post-separator"></div>
+    [% END %]
+    <div class="clear"></div>
     [% END %]
 [% END %]
-</div>

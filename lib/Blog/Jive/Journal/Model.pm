@@ -19,7 +19,7 @@ use DBICx::Modeler::Model;
 has uri => qw/is ro lazy_build 1/;
 sub _build_uri {
     my $self = shift;
-    return $self->_model__modeler->journal->uri->child( join '-', lc $self->safe_title, $self->uuid );
+    return $self->_model__modeler->journal->uri->child( qw/ post /, join '-', lc $self->safe_title, $self->uuid );
 }
 
 has safe_title => qw/is ro lazy_build 1 isa Str/;
@@ -50,6 +50,12 @@ sub _build_creation {
     return datetime( $self->_model__column_creation );
 }
 
+has local_creation => qw/is ro lazy_build 1/;
+sub _build_local_creation {
+    my $self = shift;
+    return $self->creation->set_time_zone( 'local' );
+}
+
 has body => qw/is ro lazy_build 1/;
 sub _build_body {
     my $self = shift;
@@ -76,15 +82,15 @@ sub _build_render {
     my $journal = $self->post->_model__modeler->journal;
     my $header = $self->post->document->header;
     my $content_type = $header->{content_type} || '';
-    my $ASSETS = join '/', $self->post->assets_dir->dir_list(-4);
+    my $ASSETS = join '/', $self->post->assets_dir->dir_list(-3);
     my $raw = $self->raw;
     my $render;
 
     $journal->tt->process(\$raw, { post => $self, ASSETS => $ASSETS }, \$render) or die $journal->tt->error;
     if ($content_type =~ m/\b(?:multi-)?markdown\b/) {
         $render = markdown $render;
-        $render =~ s{(\n)<pre><code>(\s*)}{$1<pre class="code"><code>$2}g;
     }
+        $render =~ s{(\n)<pre><code>(\s*)}{$1<pre class="code"><code>$2}g;
     return $render;
 }
 

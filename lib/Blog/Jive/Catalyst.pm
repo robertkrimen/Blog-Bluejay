@@ -20,7 +20,7 @@ __PACKAGE__->config(
         dirs => [qw/ static /],
     },
     'View::TT' => {
-        INCLUDE_PATH => [ __PACKAGE__->path_to( qw/assets tt/ ) ],
+        INCLUDE_PATH => [ __PACKAGE__->path_to( qw/assets tt/ ), __PACKAGE__->path_to( qw/assets journal/ ) ],
         CATALYST_VAR => 'Catalyst',
     },
 );
