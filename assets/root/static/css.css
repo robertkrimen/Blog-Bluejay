@@ -30,7 +30,9 @@ a:hover {
     float: left;
     color: #666;
     font-size: 20px;
-    text-transform: uppercase;
+    margin-bottom: 0.1em;
+    font-variant: small-caps;
+/*    text-transform: uppercase;*/
 }
 
 .datetime-month-day-year {
@@ -61,11 +63,13 @@ a:hover {
 }
 
 .post-body pre.code {
-    background: #ffe;
-    border-top: 2px dotted #ccc;
-    border-bottom: 2px dotted #ccc;
+/*    background: #ffe;*/
+    margin-left: 1em;
+    border-left: 4px solid #ccc;
+/*    border-top: 2px dotted #ccc;*/
+/*    border-bottom: 2px dotted #ccc;*/
     margin-bottom: 1em;
-    padding: 1em 0.5em;
+    padding: 0.5em 0.5em;
 /*    color: #000;*/
 }
 .post-separator {
@@ -74,4 +78,23 @@ a:hover {
 
 .clear {
     clear: both;
+}
+
+.header {
+    margin: 1em 0;
+    border-bottom: 2px solid #ccc;
+}
+
+.header-title {
+    font-size: 24px;
+    margin-left: 2em;
+}
+
+.header-home {
+    background-color: #436b95;
+    background-color: #7ad;
+    position: relative;
+/*    width: 24px;*/
+/*    height: 24px;*/
+    
 }
