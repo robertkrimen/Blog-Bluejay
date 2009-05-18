@@ -1,0 +1,42 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use Blog::Jive;
+use Path::Class;
+use Document::TriPart::Cabinet;
+
+my $jive = Blog::Jive->new;
+my $journal = $jive->journal;
+my $cabinet = $journal->cabinet;
+
+my $dir = dir 'legacy-cabinet';
+for (grep { -f $_ } $dir->children) {
+    next unless $_->basename =~ m/^($Document::TriPart::Cabinet::UUID::re)$/;
+    my $uuid = $1;
+    my $legacy_document = $_;
+    my $legacy_assets = $dir->file( "${uuid}_assets" );
+
+    my $document_dir = $cabinet->storage->document_dir( $uuid );
+    my $document_file = $cabinet->storage->document_file( $uuid );
+    my $assets_dir = $cabinet->storage->assets_dir( $uuid );
+
+    $document_dir->mkpath unless -d $document_dir;
+    
+    print "$uuid => $_ into $document_file\n";
+
+#    my $document = Document::TriPart->new( file => $legacy_document );
+#    my $document = Document::TriPart::Cabinet::Document->new( uuid => $uuid,  );
+    my $document = $cabinet->create( uuid => $uuid );
+    $document->_tp->read( $legacy_document );
+    $document->header->{creation} = delete $document->header->{cdtime};
+    $document->header->{modification} = delete $document->header->{mdtime} if exists $document->header->{mdtime};
+    $document->save;
+
+#    $cabinet->save( $document );
+
+#    system( "rsync -av $legacy_document $document_file" );
+
+    system( "rsync -av $legacy_assets/ $assets_dir/" ) if -d $legacy_assets;
+}
