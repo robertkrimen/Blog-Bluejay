@@ -63,7 +63,7 @@ sub index :Private {
     my $journal = $ctx->stash->{journal};
 
     $ctx->stash(
-        template => 'posts.tt.html',
+        template => 'page/posts.tt.html',
         posts => [ $journal->posts ],
     );
 }
@@ -100,7 +100,7 @@ sub journal_post :Regex('^post/.*-([A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-
 
     my $post = $journal->post( $uuid );
     $ctx->stash(
-        template => 'post.tt.html',
+        template => 'page/post.tt.html',
         post => $post,
     );
 }

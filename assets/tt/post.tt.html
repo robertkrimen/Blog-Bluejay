@@ -1,38 +1,33 @@
-[% DEFAULT title = "$post.title &bull;" %]
-[% CLEAR -%]
-[% WRAPPER frame.tt.html %]
+<div class="yui-gf">
+    <div class="yui-u first">
+        <div class="datetime">
 
-    <div class="yui-gf">
-        <div class="yui-u first">
-            <div class="datetime">
+            <div class="datetime-weekday">[% post.local_creation.strftime("%A") %]</div>
 
-                <div class="datetime-weekday">[% post.local_creation.strftime("%A") %]</div>
+            <div class="clear"></div>
 
-                <div class="clear"></div>
-
-                <div class="datetime-month-day">
-                    <div class="datetime-month">
-                        [% post.local_creation.strftime("%B") %]
-                    </div>
-                    <div class="datetime-day">[% post.local_creation.day %]</div>
+            <div class="datetime-month-day-year">
+                <div class="datetime-month">
+                    [% post.local_creation.strftime("%B %d %Y") %]
                 </div>
-
-                <div class="datetime-time">[% post.local_creation.strftime("%H:%M %P") %]</div>
-
-                <div class="clear"></div>
-
             </div>
+
+            <div class="clear"></div>
+
+            <div class="datetime-time">[% post.local_creation.strftime("%H:%M %P") %]</div>
+
+            <div class="clear"></div>
+
         </div>
-        <div class="yui-u">
-            <div class="post">
-                <div class="post-header">
-                    <div class="post-title"><a href="[% post.uri %]">[% post.title %]</a></div>
-                </div>
-                <div class="post-body">
-                    [% post.body.render %]
-                </div>
+    </div>
+    <div class="yui-u">
+        <div class="post">
+            <div class="post-header">
+                <div class="post-title"><a href="[% post.uri %]">[% post.title %]</a></div>
+            </div>
+            <div class="post-body">
+                [% post.body.render %]
             </div>
         </div>
     </div>
-
-[% END %]
+</div>
