@@ -71,14 +71,15 @@ sub default :Private {
     
     my $jive = $ctx->stash->{jive};
 
-    if (! $jive->status->check_home)  {
+    if ( $jive->ready ) {
         $ctx->stash(
             tree => _tree $jive->home,
         );
     }
 
     $ctx->stash(
-        template => 'status/status.tt.html',
+        template => $jive->assets->embed->{'tt/status/status.tt.html'},
+#        template => 'status/status.tt.html',
     );
 }
 

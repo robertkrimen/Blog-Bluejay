@@ -1,4 +1,4 @@
-.PHONY: all test clean distclean dist
+.PHONY: all test clean distclean dist pack
 
 all: test
 
@@ -21,3 +21,6 @@ clean: distclean
 reset: clean
 	perl Makefile.PL
 	$(MAKE) test
+
+pack:
+	tpage --include_path assets_embed --include_path assets/tt Embed.pm > lib/Blog/Jive/Assets/Embed.pm
