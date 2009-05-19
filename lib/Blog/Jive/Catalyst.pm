@@ -13,6 +13,8 @@ use Catalyst qw/-Debug
                 Static::Simple/;
 our $VERSION = '0.01';
 
+my @include_path;
+
 __PACKAGE__->config(
     name => 'Blog::Jive::Catalyst',
     root => __PACKAGE__->path_to( qw/assets root/ ),
@@ -21,7 +23,7 @@ __PACKAGE__->config(
     },
     'View::TT' => {
         INCLUDE_PATH => [
-#            __PACKAGE__->path_to( qw/assets_embed tt/ ),
+            ( -e 'assets_embed' ? Path::Class::File->new( qw/assets_embed tt/ )->absolute : () ),
             __PACKAGE__->path_to( qw/assets tt/ ),
             __PACKAGE__->path_to( qw/assets content/ )
         ],

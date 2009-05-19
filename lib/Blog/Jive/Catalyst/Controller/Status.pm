@@ -78,8 +78,8 @@ sub default :Private {
     }
 
     $ctx->stash(
-        template => $jive->assets->embed->{'tt/status/status.tt.html'},
-#        template => 'status/status.tt.html',
+#        template => $jive->assets->embed->{'tt/status/status.tt.html'},
+        template => 'status/status.tt.html',
     );
 }
 
