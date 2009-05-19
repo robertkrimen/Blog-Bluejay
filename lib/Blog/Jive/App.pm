@@ -146,6 +146,8 @@ start [qw/ home=s /], sub {
     if (defined ( my $home = $context->option( 'home' ) ) ) {
         push @jive, home => $home;
     }
+
+    # TODO If last then...
 };
 
 on 'setup' => undef, sub {
@@ -254,6 +256,35 @@ on 'server' => undef, sub {
         background        => $background,
     } );
 };
+
+on 'load' => undef, sub {
+    my $context = shift;
+    my $dir = journal->journal_dir;
+    $dir->recurse(callback => sub {
+        my $file = shift;
+        return unless -d $file;
+        return unless $file->dir_list(-1) =~ m/^($Document::TriPart::Cabinet::UUID::re)$/;
+        my $uuid = $1;
+        warn "$uuid => $file\n";
+        my $document = journal->cabinet->load( $uuid );
+        $document->save;
+    });
+};
+
+#            rescan => sub {
+#                my $context = shift;
+#                
+#                my $dir = $jive->kit->home_dir->subdir( qw/assets journal/ );
+#                $dir->recurse(callback => sub {
+#                    my $file = shift;
+#                    return unless -d $file;
+#                    return unless $file->dir_list(-1) =~ m/^($Document::TriPart::UUID::re)$/;
+#                    my $uuid = $1;
+#                    warn "$uuid => $file\n";
+#                    my $document = $journal->cabinet->load( $uuid );
+#                    $journal->commit( $document );
+#                });
+#            },
 
 on qr/.*/ => undef, sub {
     my $context = shift;

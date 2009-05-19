@@ -23,14 +23,6 @@ use lib qw/_lib/;
 
 use Moose;
 
-use Blog::Jive::Kit;
-use Blog::Jive::Journal;
-use Blog::Jive::Assets;
-
-use Path::Mapper;
-use DBICx::Modeler;
-use DBIx::Deploy;
-use Scalar::Util qw/weaken/;
 use Path::Class;
 
 has home => qw/reader _home lazy_build 1/;
@@ -39,6 +31,8 @@ sub _build_home {
     return dir( $ENV{HOME}, '.blog-jive' ); # TODO Use Find::HomeDir or whatever...
 }
 
+has uri => qw/is ro/; # For configuring the kit, hackish?
+
 sub BUILD {
     my $self = shift;
     my $given = shift;
@@ -46,21 +40,34 @@ sub BUILD {
 
 has kit => qw/is ro lazy_build 1/, handles => [qw/ home home_dir /];
 sub _build_kit {
+    require Blog::Jive::Kit;
     my $self = shift;
-    return Blog::Jive::Kit->new( jive => $self );
+    my @give;
+    push @give, uri => $self->uri if $self->uri;
+    return Blog::Jive::Kit->new( jive => $self, @give );
 }
 
 has journal => qw/is ro lazy_build 1/;
 sub _build_journal {
+    require Blog::Jive::Journal;
     my $self = shift;
     return Blog::Jive::Journal->new( jive => $self );
 }
 
 has assets => qw/is ro lazy_build 1/;
 sub _build_assets {
+    require Blog::Jive::Assets;
     my $self = shift;
     # TODO Implement overwrite option
     return Blog::Jive::Assets->new( base => $self->kit->home );
+}
+
+has status => qw/is ro lazy_build 1/;
+sub _build_status {
+    require Blog::Jive::Status;
+    my $self = shift;
+    # TODO Implement overwrite option
+    return Blog::Jive::Status->new( jive => $self );
 }
 
 =head1 AUTHOR

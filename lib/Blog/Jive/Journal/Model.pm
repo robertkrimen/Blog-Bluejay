@@ -66,7 +66,13 @@ package Blog::Jive::Journal::Model::Post::Body;
 
 use Moose;
 
-use Text::MultiMarkdown qw/markdown/;
+{
+    my $markdown;
+    sub _markdown() {
+        require Text::MultiMarkdown;
+        return $markdown ||= Text::MultiMarkdown->new;
+    }
+}
 
 has post => qw/is ro required 1/;
 
@@ -88,7 +94,7 @@ sub _build_render {
 
     $journal->tt->process(\$raw, { post => $self, ASSETS => $ASSETS }, \$render) or die $journal->tt->error;
     if ($content_type =~ m/\b(?:multi-)?markdown\b/) {
-        $render = markdown $render;
+        $render = _markdown->markdown( $render );
     }
         $render =~ s{(\n)<pre><code>(\s*)}{$1<pre class="code"><code>$2}g;
     return $render;

@@ -2,7 +2,8 @@ package Blog::Jive::Catalyst::Controller::Root;
 
 use strict;
 use warnings;
-use parent 'Catalyst::Controller';
+
+use parent qw/Catalyst::Controller/;
 
 __PACKAGE__->config->{namespace} = '';
 
@@ -32,8 +33,9 @@ sub auto :Private {
 
 #    if ($ctx->request->path =~ m/journal(\/|$)/) {
     if ( 1 ) {
-        my $jive = Blog::Jive->new( home => $ENV{BLOG_JIVE_HOME} ); # This feels like a hack...
-        $jive->kit->uri( URI::PathAbstract->new( $ctx->request->base ) );
+#        my $jive = Blog::Jive->new( home => $ENV{BLOG_JIVE_HOME} ); # This feels like a hack...
+#        $jive->kit->uri( URI::PathAbstract->new( $ctx->request->base ) );
+        my $jive = $ctx->model( 'Jive' );
         my $journal = $jive->journal;
         $ctx->stash->{journal} = $journal;
     }

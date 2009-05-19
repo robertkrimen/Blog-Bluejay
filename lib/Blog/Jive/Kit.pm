@@ -5,18 +5,18 @@ use strict;
 
 use Moose;
 
-use URI::PathAbstract;
-
 with qw/Blog::Jive::Component/;
 
 has path_mapper => qw/is ro lazy_build 1/, handles => [qw/ dir file /];
 sub _build_path_mapper {
+    require Path::Mapper;
     my $self = shift;
     return Path::Mapper->new( base => $self->jive->_home );
 }
 
 has uri => qw/is rw lazy_build 1/;
 sub _build_uri {
+    require URI::PathAbstract;
     return URI::PathAbstract->new( 'http://example.com' );
 }
 

@@ -4,19 +4,11 @@ use strict;
 use warnings;
 
 use Moose;
-use Carp::Clan;
+use Carp::Clan; # TODO Carp::Clan::Share
 
 with qw/Blog::Jive::Component/;
 
-use Blog::Jive::Journal::Schema;
-use Blog::Jive::Journal::Model;
-use Blog::Jive::Journal::Month;
-use Blog::Jive::Journal::Overview;
-
-use Text::MultiMarkdown qw/markdown/;
 use Scalar::Util qw/weaken/;
-use Document::TriPart::Cabinet;
-use Document::TriPart::Cabinet::Storage::Disk;
 
 has uri => qw/is ro lazy_build 1/;
 sub _build_uri {
@@ -27,11 +19,12 @@ sub _build_uri {
 has schema_file => qw/is ro lazy_build 1/;
 sub _build_schema_file {
     my $self = shift;
-    return $self->kit->file( 'run/journal.sqlite' );
+    return $self->kit->file( 'run/content.sqlite' );
 }
 
 has deploy => qw/is ro lazy_build 1/;
 sub _build_deploy {
+    require DBIx::Deploy;
     my $self = shift;
     my $deploy;
     $deploy = DBIx::Deploy->create(
@@ -65,6 +58,7 @@ _END_
 };
 has schema => qw/is ro lazy_build 1/;
 sub _build_schema {
+    require Blog::Jive::Journal::Schema;
     my $self = shift;
     my $schema = Blog::Jive::Journal::Schema->connect( $self->deploy->information );
     $schema->journal($self);
@@ -74,6 +68,7 @@ sub _build_schema {
 
 has modeler => qw/is ro lazy_build 1/;
 sub _build_modeler {
+    require Blog::Jive::Journal::Model;
     my $self = shift;
     my $model = Blog::Jive::Journal::Modeler->new( journal => $self, schema => $self->schema, namespace => '+Blog::Jive::Journal::Model' );
     return $model;
@@ -81,6 +76,7 @@ sub _build_modeler {
 
 has cabinet => qw/is ro lazy_build 1/;
 sub _build_cabinet {
+    require Document::TriPart::Cabinet::Storage::Disk;
     my $self = shift;
     my $storage = Document::TriPart::Cabinet::Storage::Disk->new( dir => $self->journal_dir );
     my $cabinet = Blog::Jive::Journal::Cabinet->new( jive => $self->jive, storage => $storage );
@@ -90,11 +86,12 @@ sub _build_cabinet {
 has journal_dir => qw/is ro lazy_build 1/;
 sub _build_journal_dir {
     my $self = shift;
-    return $self->jive->kit->dir( 'assets/journal');
+    return $self->jive->kit->dir( 'assets/content' );
 }
 
 has tt => qw/is ro lazy_build 1/;
 sub _build_tt {
+    require Template;
     my $self = shift;
     return Template->new({
         INCLUDE_PATH => [ $self->journal_dir.'' ],
@@ -103,6 +100,7 @@ sub _build_tt {
 
 has overview => qw/is ro lazy_build 1/;
 sub _build_overview {
+    require Blog::Jive::Journal::Overview;
     my $self = shift;
     return Blog::Jive::Journal::Overview->new( journal => $self );
 }
@@ -139,6 +137,7 @@ sub posts_for_month {
 }
 
 sub month {
+    require Blog::Jive::Journal::Month;
     my $self = shift;
     my $month = shift;
     $month = Blog::Jive::Journal::Month->parse($month, journal => $self);

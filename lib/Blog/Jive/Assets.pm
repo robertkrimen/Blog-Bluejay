@@ -8,6 +8,7 @@ use Directory::Deploy::Declare;
 include <<'_END_';
 run/
 assets/
+assets/content
 assets/root/
 assets/root/static/
 assets/tt/

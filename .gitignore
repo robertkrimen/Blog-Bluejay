@@ -1,4 +1,4 @@
-assets/journal
+assets/content
 run
 root
 home
@@ -9,3 +9,8 @@ Project-*
 assets.tmp
 legacy-cabinet
 local
+*nytprof*
+bitcons*
+sanscons*
+clearbits
+tt
