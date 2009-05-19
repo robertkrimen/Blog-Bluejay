@@ -11,12 +11,12 @@ use Moose;
 use YUI::Loader;
 use jQuery::Loader;
 use File::Assets;
-use CatalystXPathCatalog;
 use Blog::Jive;
 use Text::Lorem::More;
 
 has catalog => qw/is ro lazy_build 1/;
 sub _build_catalog {
+    require CatalystXPathCatalog;
     my $catalog = CatalystXPathCatalog->new( catalog => <<_END_ );
 /           index.tt.html
 /mock       mock/index.tt.html
@@ -31,13 +31,12 @@ sub auto :Private {
     my $jquery = $stash->{jquery} = jQuery::Loader->new_from_internet;
     my $assets = $stash->{assets} = File::Assets->new( base => { dir =>  $ctx->path_to, uri => $ctx->uri_for, } );
 
-#    if ($ctx->request->path =~ m/journal(\/|$)/) {
     if ( 1 ) {
-#        my $jive = Blog::Jive->new( home => $ENV{BLOG_JIVE_HOME} ); # This feels like a hack...
-#        $jive->kit->uri( URI::PathAbstract->new( $ctx->request->base ) );
         my $jive = $ctx->model( 'Jive' );
-        my $journal = $jive->journal;
-        $ctx->stash->{journal} = $journal;
+        $ctx->stash(
+            jive => $jive,
+            journal => $jive->journal,
+        );
     }
 
     return 1;

@@ -15,7 +15,10 @@ my ($scratch, $jive);
 $scratch = Directory::Scratch->new;
 $jive = Blog::Jive->new( home => $scratch->dir( qw/home/ ) );
 
-is( $jive->status->check_home, 'home-not-exist' );
+is( $jive->status->check_home, 'home-missing' );
+ok( ! $jive->guessed_home );
+
+# TODO: Check accessible, is directory
 
 $jive->assets->deploy;
 
