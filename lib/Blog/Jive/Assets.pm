@@ -100,6 +100,13 @@ _END_
 
 no Directory::Deploy::Declare;
 
+use Moose;
+
+has embed => qw/is ro lazy_build 1/;
+sub _build_embed {
+    require Blog::Jive::Assets::Embed;
+    Blog::Jive::Assets::Embed->catalog;
+}
 # TODO Add reporting option/return manifest
 
 1;

@@ -72,6 +72,11 @@ sub _build_status {
     return Blog::Jive::Status->new( jive => $self );
 }
 
+sub ready {
+    my $self = shift;
+    return $self->status->check_home ? 0 : 1;
+}
+
 =head1 AUTHOR
 
 Robert Krimen, C<< <rkrimen at cpan.org> >>
