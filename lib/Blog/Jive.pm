@@ -22,6 +22,7 @@ our $VERSION = '0.01';
 use lib qw/_lib/;
 
 use Moose;
+use Blog::Jive::Carp;
 
 use Path::Class;
 
@@ -30,28 +31,39 @@ sub _build_home {
     my $self = shift;
     return $ENV{BLOG_JIVE_HOME} if defined $ENV{BLOG_JIVE_HOME};
     $self->guessed_home( 1 );
-    return dir( $ENV{HOME}, '.blog-jive' ); # TODO Use Find::HomeDir or whatever...
+    # TODO Check for .bluejay (or whatever)
+    # TODO Use Find::HomeDir (or whatever)
+    return dir( $ENV{HOME}, '.blog-jive' );
 }
 has guessed_home => qw/is rw isa Bool default 0/; # TODO Invalid if called before ->home
 sub home_exists {
     my $self = shift;
     return -e $self->home;
 }
+sub home {
+    return shift->home_dir( @_ );
+}
+sub home_dir {
+    return shift->path_mapper->dir( '/' );
+}
+has path_mapper => qw/is ro lazy_build 1/, handles => [qw/ dir file /];
+sub _build_path_mapper {
+    require Path::Mapper;
+    my $self = shift;
+    return Path::Mapper->new( base => $self->_home );
+}
 
-has uri => qw/is ro/; # For configuring the kit, hackish?
+has uri => qw/is rw isa URI::PathAbstract lazy 1/, default => sub { croak "No URI was set" };
+sub set_uri {
+    require URI::PathAbstract;
+    my $self = shift;
+    $self->uri( URI::PathAbstract->new( shift ) );
+}
 
 sub BUILD {
     my $self = shift;
     my $given = shift;
-}
-
-has kit => qw/is ro lazy_build 1/, handles => [qw/ home home_dir /];
-sub _build_kit {
-    require Blog::Jive::Kit;
-    my $self = shift;
-    my @give;
-    push @give, uri => $self->uri if $self->uri;
-    return Blog::Jive::Kit->new( jive => $self, @give );
+    $self->set_uri( $given->{uri} ) if $given->{uri};
 }
 
 has journal => qw/is ro lazy_build 1/;
@@ -66,21 +78,30 @@ sub _build_assets {
     require Blog::Jive::Assets;
     my $self = shift;
     # TODO Implement overwrite option
-    return Blog::Jive::Assets->new( base => $self->kit->home );
+    return Blog::Jive::Assets->new( base => $self->home );
 }
 
-has status => qw/is ro lazy_build 1/;
-sub _build_status {
-    require Blog::Jive::Status;
-    my $self = shift;
-    # TODO Implement overwrite option
-    return Blog::Jive::Status->new( jive => $self );
-}
+#has kit => qw/is ro lazy_build 1/, handles => [qw/ home home_dir /];
+#sub _build_kit {
+#    require Blog::Jive::Kit;
+#    my $self = shift;
+#    my @give;
+#    push @give, uri => $self->uri if $self->uri;
+#    return Blog::Jive::Kit->new( jive => $self, @give );
+#}
 
-sub ready {
-    my $self = shift;
-    return $self->status->check_home ? 0 : 1;
-}
+#has status => qw/is ro lazy_build 1/;
+#sub _build_status {
+#    require Blog::Jive::Status;
+#    my $self = shift;
+#    # TODO Implement overwrite option
+#    return Blog::Jive::Status->new( jive => $self );
+#}
+
+#sub ready {
+#    my $self = shift;
+#    return $self->status->check_home ? 0 : 1;
+#}
 
 =head1 AUTHOR
 

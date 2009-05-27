@@ -23,5 +23,5 @@ ok( ! $jive->home_exists );
 Blog::Jive::App->new->run([qw/ server /]);
 
 ok( $jive->home_exists );
-ok( -f $jive->kit->file( 'assets/tt/frame.tt.html' ) );
+ok( -f $jive->file( 'assets/tt/frame.tt.html' ) );
 

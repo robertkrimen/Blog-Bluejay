@@ -13,13 +13,13 @@ use Scalar::Util qw/weaken/;
 has uri => qw/is ro lazy_build 1/;
 sub _build_uri {
     my $self = shift;
-    return $self->jive->kit->uri->child(qw//);
+    return $self->jive->uri->child(qw//);
 }
 
 has schema_file => qw/is ro lazy_build 1/;
 sub _build_schema_file {
     my $self = shift;
-    return $self->kit->file( 'run/content.sqlite' );
+    return $self->jive->file( 'run/content.sqlite' );
 }
 
 has deploy => qw/is ro lazy_build 1/;
@@ -86,7 +86,7 @@ sub _build_cabinet {
 has journal_dir => qw/is ro lazy_build 1/;
 sub _build_journal_dir {
     my $self = shift;
-    return $self->jive->kit->dir( 'assets/content' );
+    return $self->jive->dir( 'assets/content' );
 }
 
 has tt => qw/is ro lazy_build 1/;

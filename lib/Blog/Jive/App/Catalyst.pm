@@ -5,7 +5,7 @@ our $TEST;
 sub do_setup ($) {
     my $ctx = shift;
 
-    unless ( -f $ctx->jive->kit->file( 'assets/tt/frame.tt.html' ) ) { # TODO Make this stronger
+    unless ( -f $ctx->jive->file( 'assets/tt/frame.tt.html' ) ) { # TODO Make this stronger
         $ctx->jive->assets->deploy;
     }
 }

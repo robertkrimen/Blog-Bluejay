@@ -12,6 +12,10 @@ use Blog::Jive;
 
 my ($scratch, $jive);
 
+ok( 1 ) and exit;
+
+__END__
+
 $scratch = Directory::Scratch->new;
 $jive = Blog::Jive->new( home => $scratch->dir( qw/home/ ) );
 
