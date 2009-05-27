@@ -10,17 +10,36 @@ use Carp;
 use Path::Abstract;
 use DateTime;
 use Getopt::Chain;
+use Document::TriPart::Cabinet::UUID;
 use Term::Prompt;
 use File::Find();
 local $Term::Prompt::MULTILINE_INDENT = undef;
 use Text::ASCIITable;
+
+our $PRINT = sub { print @_ };
+
+package Blog::Jive::AppContext;
+
+use Moose;
+extends qw/Getopt::Chain::Context/;
+
+sub jive {
+    return &Blog::Jive::App::jive;
+}
+
+sub print {
+    shift;
+    $PRINT->( @_ );
+}
+
+package Blog::Jive::App;
 
 my @jive;
 
 {
     my $jive;
     sub jive {
-        return $jive ||= Blog::Jive->new( @_ );
+        return $jive ||= Blog::Jive->new( @jive, @_ );
     }
 
     sub journal {
@@ -85,7 +104,8 @@ sub find {
 # Do #
 ######
 
-sub do_list {
+sub do_list ($;$) {
+    my $ctx = shift;
     my $search = shift;
 
     $search = scalar journal->posts unless $search;
@@ -94,7 +114,12 @@ sub do_list {
     my $tb = Text::ASCIITable->new({ hide_HeadLine => 1 });
     $tb->setCols( '', '', '' );
     $tb->addRow( $_->uuid, $_->title, $_->folder ) for @posts;
-    print $tb;
+    $ctx->print( $tb );
+}
+
+sub do_usage ($) {
+    my $ctx = shift;
+    Blog::Jive::App::help::do_usage $ctx;
 }
 
 sub do_new {
@@ -106,11 +131,12 @@ sub do_new {
     return $document;
 }
 
-sub do_find {
+sub do_find ($@) {
+    my $ctx = shift;
     my @criteria = @_;
 
     unless (@criteria) {
-        do_list;
+        do_list $ctx;
         return;
     }
 
@@ -123,10 +149,11 @@ sub do_find {
     return $post;
 }
 
-sub do_choose {
+sub do_choose ($$) {
+    my $ctx = shift;
     my $search = shift;
 
-    print "Too many posts found matching your criteria\n";
+    $ctx->print( "Too many posts found matching your criteria\n" );
 
     list $search;
 }
@@ -135,37 +162,63 @@ sub prompt_yn ($$) {
     return prompt Y => shift, '', shift;
 }
 
+sub do_no_command ($) {
+    my $ctx = shift;
+
+    if ( jive->home_exists ) {
+        do_usage $ctx;
+        do_list $ctx;
+    }
+    else {
+        &Blog::Jive::App::help::do_synopsis( $ctx );
+    }
+
+    exit -1;
+}
+
 #######
 # Run #
 #######
 
 use Getopt::Chain::Declare;
 
+context 'Blog::Jive::AppContext';
+
 start [qw/ home=s /], sub {
-    my $context = shift;
-    if (defined ( my $home = $context->option( 'home' ) ) ) {
+    my $ctx = shift;
+
+    if (defined ( my $home = $ctx->option( 'home' ) ) ) {
         push @jive, home => $home;
     }
 
-    # TODO If last then...
+    $ctx->stash(
+        jive => jive,
+    );
+
+    if ( $ctx->last ) {
+        do_no_command $ctx;
+    }
 };
 
 on 'setup' => undef, sub {
-    my $context = shift;
+    my $ctx = shift;
 
-    print <<_END_ and return if 1;
+    if ( 1 ) {
+        $ctx->print( <<_END_ );
 Don't overwrite your work, fool!
 _END_
+        return
+    }
 
-    print <<_END_;
-
-I will setup in @{[ journal->kit->home_dir ]}
+    $ctx->print( <<_END_ );
+\nI will setup in @{[ journal->kit->home_dir ]}
 _END_
+
     if ( prompt_yn 'Is this okay? Y/n', 'Y' ) {
 
         jive->assets->deploy;
 
-        print "\n";
+        $ctx->print( "\n" );
         my $home = jive->home;
         $home = readlink $home if -l $home;
         File::Find::find( { no_chdir => 1, wanted => sub {
@@ -174,27 +227,26 @@ _END_
             my $size;
             $size = -s _ if -f $_;
 
-            print "\t", substr $_, 1 + length $home;
-            print " $size" if defined $size;
-            print "\n";
+            $ctx->print( "\t", substr $_, 1 + length $home );
+            $ctx->print( " $size" ) if defined $size;
+            $ctx->print( "\n" );
 
         } }, $home );
-        print "\n";
+        $ctx->print( "\n" );
 
     }
     else {
-        print "Aborting deploy\n";
+        $ctx->print( "Aborting deploy\n" );
     }
-
-    
 };
 
 on 'publish' => undef, sub {
+    my $ctx = shift;
 };
 
 on 'edit *' => undef, sub {
-    shift;
-    return do_list unless @_;
+    my $ctx = shift;
+    return do_list $ctx unless @_;
 
     my ($post, $search, $count) = find @_;
 
@@ -202,63 +254,16 @@ on 'edit *' => undef, sub {
         $post->edit;
     }
     else {
-        return do_choose $search if $count > 1;
+        return do_choose $ctx, $search if $count > 1;
         return unless my ($folder, $title) = folder_title @_;
         if (prompt_yn "Post \"$title\" not found. Do you want to start it? y/N", 'N') {
-            my $post = do_new $folder, $title;
+            my $post = do_new $ctx, $folder, $title;
         }
     }
 };
 
-on 'server' => undef, sub {
-    shift;
-    $ENV{BLOG_JIVE_HOME} = jive->home;
-    $ENV{BLOG_JIVE_CATALYST_HOME} = jive->home;
-
-    my $debug             = 0;
-    my $fork              = 0;
-    my $help              = 0;
-    my $host              = undef;
-    my $port              = $ENV{BLOG_JIVE_CATALYST_PORT} || $ENV{CATALYST_PORT} || 3000;
-    my $keepalive         = 0;
-    my $restart           = $ENV{BLOG_JIVE_CATALYST_RELOAD} || $ENV{CATALYST_RELOAD} || 0;
-    my $restart_delay     = 1;
-    my $restart_regex     = '(?:/|^)(?!\.#).+(?:\.yml$|\.yaml$|\.conf|\.pm)$';
-    my $restart_directory = undef;
-    my $follow_symlinks   = 0;
-    my $background        = 0;
-    my @argv;
-
-    BEGIN {
-        $ENV{CATALYST_ENGINE} ||= 'HTTP';
-        $ENV{CATALYST_SCRIPT_GEN} = 33;
-        require Catalyst::Engine::HTTP;
-    }
-
-    if ( $restart && $ENV{CATALYST_ENGINE} eq 'HTTP' ) {
-        $ENV{CATALYST_ENGINE} = 'HTTP::Restarter';
-    }
-    if ( $debug ) {
-        $ENV{CATALYST_DEBUG} = 1;
-    }
-
-    require Blog::Jive::Catalyst;
-
-    Blog::Jive::Catalyst->run( $port, $host, {
-        argv              => \@argv,
-        'fork'            => $fork,
-        keepalive         => $keepalive,
-        restart           => $restart,
-        restart_delay     => $restart_delay,
-        restart_regex     => qr/$restart_regex/,
-        restart_directory => $restart_directory,
-        follow_symlinks   => $follow_symlinks,
-        background        => $background,
-    } );
-};
-
 on 'load' => undef, sub {
-    my $context = shift;
+    my $ctx = shift;
     my $dir = journal->journal_dir;
     $dir->recurse(callback => sub {
         my $file = shift;
@@ -271,43 +276,35 @@ on 'load' => undef, sub {
     });
 };
 
-#            rescan => sub {
-#                my $context = shift;
-#                
-#                my $dir = $jive->kit->home_dir->subdir( qw/assets journal/ );
-#                $dir->recurse(callback => sub {
-#                    my $file = shift;
-#                    return unless -d $file;
-#                    return unless $file->dir_list(-1) =~ m/^($Document::TriPart::UUID::re)$/;
-#                    my $uuid = $1;
-#                    warn "$uuid => $file\n";
-#                    my $document = $journal->cabinet->load( $uuid );
-#                    $journal->commit( $document );
-#                });
-#            },
+on 'status' => undef, sub {
+    my $ctx = shift;
+    my ($problem);
+    $ctx->print( "home = ", jive->home);
+    $ctx->print( " (guessed)") if $ctx->jive->guessed_home;
+    $ctx->print( " ($problem)") if defined ($problem = $ctx->jive->status->check_home); 
+    $ctx->print( "\n" );
+};
+
+on 'list' => undef, sub {
+    my $ctx = shift;
+
+    do_list $ctx;
+};
+
+require Blog::Jive::App::Catalyst;
+require Blog::Jive::App::help;
 
 on qr/.*/ => undef, sub {
-    my $context = shift;
-    my $command = $context->command;
+    my $ctx = shift;
+    my $command = $ctx->command;
 
     if ($command) {
-        print "\nblog-jive: Unknown command \"$command\"\n";
+        $ctx->print( "\nblog-jive: Unknown command \"$command\"\n" );
     }
 
-    print <<_END_;
-
-    Usage: blog-jive <command>
-
-        setup
-        edit
-        publish
-
-        list 
-        assets <key>
-
-_END_
-
-    do_list;
+    do_usage $ctx;
+    do_list $ctx;
+    exit -1;
 };
 
 

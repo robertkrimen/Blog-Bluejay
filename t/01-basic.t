@@ -7,4 +7,11 @@ use Test::Most;
 
 plan qw/no_plan/;
 
-ok( 1 );
+use Blog::Jive;
+
+{
+    local $ENV{BLOG_JIVE_HOME} = 'null';
+
+    my $jive = Blog::Jive->new;
+    is( $jive->home, 'null' );
+}

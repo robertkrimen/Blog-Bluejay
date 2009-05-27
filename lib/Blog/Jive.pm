@@ -28,10 +28,15 @@ use Path::Class;
 has home => qw/reader _home lazy_build 1/;
 sub _build_home {
     my $self = shift;
+    return $ENV{BLOG_JIVE_HOME} if defined $ENV{BLOG_JIVE_HOME};
     $self->guessed_home( 1 );
     return dir( $ENV{HOME}, '.blog-jive' ); # TODO Use Find::HomeDir or whatever...
 }
 has guessed_home => qw/is rw isa Bool default 0/; # TODO Invalid if called before ->home
+sub home_exists {
+    my $self = shift;
+    return -e $self->home;
+}
 
 has uri => qw/is ro/; # For configuring the kit, hackish?
 

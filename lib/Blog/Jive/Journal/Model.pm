@@ -87,16 +87,22 @@ sub _build_render {
 
     my $journal = $self->post->_model__modeler->journal;
     my $header = $self->post->document->header;
-    my $content_type = $header->{content_type} || '';
-    my $ASSETS = join '/', $self->post->assets_dir->dir_list(-3);
-    my $raw = $self->raw;
-    my $render;
+    my $type = $header->{type} || ''; # TODO Make this configurable
 
-    $journal->tt->process(\$raw, { post => $self, ASSETS => $ASSETS }, \$render) or die $journal->tt->error;
-    if ($content_type =~ m/\b(?:multi-)?markdown\b/) {
-        $render = _markdown->markdown( $render );
+    my $render = $self->raw;
+    if ($type =~ m/\btt\b/) {
+        my $ASSETS = join '/', $self->post->assets_dir->dir_list(-3);
+        my $input = \$render;
+        my $output;
+        $journal->tt->process( $input, { post => $self, ASSETS => $ASSETS }, \$output ) or die $journal->tt->error;
+        $render = $output;
     }
-        $render =~ s{(\n)<pre><code>(\s*)}{$1<pre class="code"><code>$2}g;
+
+    if ($type =~ m/\bmarkdown\b/) {
+        $render = _markdown->markdown( $render );
+        $render =~ s{(\n)<pre><code>(\s*)}{$1<pre class="code"><code>$2}g; # TODO Urgh, ...
+    }
+
     return $render;
 }
 

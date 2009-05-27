@@ -111,7 +111,11 @@ sub uuid_path {
 
 sub posts {
     my $self = shift;
-    return $self->modeler->model( 'Post' )->search( @_ );
+    my @search = @_;
+    
+    @search = ( undef, { order_by => [qw/ creation DESC /] } ) unless @search;
+
+    return $self->modeler->model( 'Post' )->search( @search );
 }
 
 sub post {
