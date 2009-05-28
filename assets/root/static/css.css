@@ -15,22 +15,31 @@ a:hover {
 }
 
 .datetime {
-    float: left;
+    float: right;
     color: #666;
     font-size: 14px;
+    line-height: 1.2;
+    margin: 15px -10px 20px 20px;
+    margin: 0px -10px 20px 20px;
+    margin: 0px 0px 10px 20px;
+/*    background: #eee;*/
+/*    background: #eee;*/
+/*    border: 2px solid #eef;*/
+/*    border-bottom: 2px solid #eee;*/
+    padding: 5px;
 }
 
 .datetime-time {
     float: left;
-    font-size: 16px;
+    font-size: 12px;
 /*    margin-left: 10px;*/
 }
 
 .datetime-weekday {
     float: left;
     color: #666;
-    font-size: 20px;
-    margin-bottom: 0.1em;
+    font-size: 16px;
+/*    margin-bottom: 0.1em;*/
     font-variant: small-caps;
 /*    text-transform: uppercase;*/
 }
@@ -38,16 +47,18 @@ a:hover {
 .datetime-month-day-year {
     float: left;
     overflow: hidden;
+    font-size: 12px;
     font-weight: bold;
-    background-color: #999;
-    color: #eee;
+/*    background-color: #999;*/
+/*    color: #eee;*/
     line-height: 12px;
-    padding: 5px;
+    padding: 3px 0;
 }
 
 .post {
     color: #333;
     font-size: 14px;
+    border-bottom: 1px dotted #ddd;
 }
 
 .post-title {
@@ -69,11 +80,11 @@ a:hover {
 /*    border-top: 2px dotted #ccc;*/
 /*    border-bottom: 2px dotted #ccc;*/
     margin-bottom: 1em;
-    padding: 0.5em 0.5em;
+    padding: 10px 10px;
 /*    color: #000;*/
 }
 .post-separator {
-    margin-top: 2.5em;
+    margin-top: 10px;
 }
 
 .clear {

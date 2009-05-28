@@ -24,6 +24,9 @@ sub journal { return shift->page( 'journal' ) }
 sub about { return shift->page( 'about' ) }
 sub contact { return shift->page( 'contact' ) }
 
+# sub home_path { '' }
+# sub home_label { undef } # Could be some title or something?
+
 sub parse {
     require Path::Abstract;
     my $self = shift;
@@ -48,7 +51,7 @@ sub _new_page {
 
     $class = 'Blog::Jive::Layout::TemplatePage';
     $label = $page_blueprint->{label};
-    undef $label if defined $label && ! length $label;
+    undef $label if defined $label && ! length $label; # Blech
 
     if ( $name eq 'journal' ) {
         $class = 'Blog::Jive::Layout::JournalPage';
