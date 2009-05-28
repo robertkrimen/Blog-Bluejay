@@ -33,4 +33,19 @@ __PACKAGE__->config(
 
 __PACKAGE__->setup();
 
+sub jive {
+    my $self = shift;
+    return $self->model( 'Jive' );
+}
+
+sub layout {
+    my $self = shift;
+    return $self->jive->layout;
+}
+
+sub journal {
+    my $self = shift;
+    return $self->jive->journal;
+}
+
 1;

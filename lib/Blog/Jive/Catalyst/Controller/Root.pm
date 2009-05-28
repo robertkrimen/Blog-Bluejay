@@ -14,92 +14,58 @@ use File::Assets;
 use Blog::Jive;
 use Text::Lorem::More;
 
-has catalog => qw/is ro lazy_build 1/;
-sub _build_catalog {
-    require CatalystXPathCatalog;
-    my $catalog = CatalystXPathCatalog->new( catalog => <<_END_ );
-/           index.tt.html
-/mock       mock/index.tt.html
-_END_
-    return $catalog;
-}
-
 sub auto :Private {
     my ( $self, $ctx ) = @_;
+
     my $stash = $ctx->stash;
     my $yui = $stash->{yui} = YUI::Loader->new_from_internet;
     my $jquery = $stash->{jquery} = jQuery::Loader->new_from_internet;
     my $assets = $stash->{assets} = File::Assets->new( base => { dir =>  $ctx->path_to, uri => $ctx->uri_for, } );
 
-    if ( 1 ) {
-        my $jive = $ctx->model( 'Jive' );
-        $ctx->stash(
-            jive => $jive,
-            journal => $jive->journal,
-        );
-    }
+    $ctx->stash(
+        jive => $ctx->jive,
+        journal => $ctx->journal,
+        layout => $ctx->layout,
+    );
 
     return 1;
-}
-
-sub default :Private {
-    my ( $self, $ctx ) = @_;
-
-    $ctx->forward( 'not_found' ) unless $self->catalog->dispatch( $ctx );
-}
-
-sub mock :Local {
-    my ( $self, $ctx ) = @_;
-
-    $ctx->stash(
-        lorem => Text::Lorem::More->new,
-    );
-    
-    $ctx->forward( 'not_found' ) unless $self->catalog->dispatch( $ctx );
 }
 
 sub index :Private {
     my ( $self, $ctx ) = @_;
 
-    my $journal = $ctx->stash->{journal};
-
-    $ctx->stash(
-        template => 'page/posts.tt.html',
-        posts => [ $journal->posts ],
-    );
+    if ( my $home = $ctx->layout->home ) {
+        $home->render( $ctx );
+    }
+    else {
+        $ctx->forward( 'journal' );
+    }
 }
 
-#sub journal :Local {
-#    my ( $self, $ctx ) = @_;
-
-#    my $journal = $ctx->stash->{journal};
-
-#    $ctx->stash(
-#        template => 'journal/home.tt.html',
-#        posts => [ $journal->posts ],
-#    );
-#}
-
-#sub journal_month :Regex('^journal/(\d{4})/(\d{1,2})') {
-#    my ( $self, $ctx ) = @_;
-
-#    my $journal = $ctx->stash->{journal};
-#    my ($year, $month) = @{ $ctx->request->captures };
-
-#    $month = $journal->month( "$year-$month" );
-#    $ctx->stash(
-#        template => 'journal/month.tt.html',
-#        posts => [ $month->posts ],
-#    );
-#}
-
-sub journal_post :Regex('^post/.*-([A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{12})') {
+sub journal :Local {
     my ( $self, $ctx ) = @_;
 
-    my $journal = $ctx->stash->{journal};
+    $ctx->layout->journal->render( $ctx );
+}
+
+sub about :Local {
+    my ( $self, $ctx ) = @_;
+
+    $ctx->layout->about->render( $ctx );
+}
+
+sub contact :Local {
+    my ( $self, $ctx ) = @_;
+
+    $ctx->layout->contact->render( $ctx );
+}
+
+sub journal_post :Regex('^journal/.*-([A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{12})') {
+    my ( $self, $ctx ) = @_;
+
     my ($uuid) = @{ $ctx->request->captures };
 
-    my $post = $journal->post( $uuid );
+    my $post = $ctx->journal->post( $uuid );
     $ctx->stash(
         template => 'page/post.tt.html',
         post => $post,
@@ -118,7 +84,7 @@ sub feed_atom :Path('feed/atom') {
         author  => '$author',
     );
 
-    my $journal = $ctx->stash->{journal};
+    my $journal = $ctx->journal;
 
     $ctx->stash(
         posts => [ $journal->posts ],
@@ -147,3 +113,17 @@ sub not_found :Private {
 sub end : ActionClass('RenderView') {}
 
 1;
+
+#sub journal_month :Regex('^journal/(\d{4})/(\d{1,2})') {
+#    my ( $self, $ctx ) = @_;
+
+#    my $journal = $ctx->stash->{journal};
+#    my ($year, $month) = @{ $ctx->request->captures };
+
+#    $month = $journal->month( "$year-$month" );
+#    $ctx->stash(
+#        template => 'journal/month.tt.html',
+#        posts => [ $month->posts ],
+#    );
+#}
+

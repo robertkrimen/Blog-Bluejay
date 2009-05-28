@@ -25,6 +25,7 @@ use Moose;
 use Blog::Jive::Carp;
 
 use Path::Class();
+use Scalar::Util qw/weaken/;
 
 has home => qw/reader _home lazy_build 1/;
 sub _build_home {
@@ -60,18 +61,16 @@ sub set_uri {
     $self->uri( URI::PathAbstract->new( shift ) );
 }
 
-sub BUILD {
+has _config => qw/is ro lazy_build 1/;
+sub _build__config {
+    require Config::JFDI;
     my $self = shift;
-    my $given = shift;
-    $self->set_uri( $given->{uri} ) if $given->{uri};
+    my $config = Config::JFDI->new( name => 'bluejay', path => $self->home );
+    return $config;
 }
-
-#has journal => qw/is ro lazy_build 1/;
-#sub _build_journal {
-#    require Blog::Jive::Journal;
-#    my $self = shift;
-#    return Blog::Jive::Journal->new( jive => $self );
-#}
+sub config {
+    return shift->_config->get;
+}
 
 has cabinet => qw/is ro lazy_build 1/;
 sub _build_cabinet {
@@ -82,8 +81,6 @@ sub _build_cabinet {
     my $cabinet = Blog::Jive::Cabinet->new( jive => $self, storage => $storage );
     return $cabinet;
 }
-
-use Scalar::Util qw/weaken/;
 
 has schema_file => qw/is ro lazy_build 1/;
 sub _build_schema_file {
@@ -172,27 +169,20 @@ sub _build_journal {
     return Blog::Jive::Model::Journal->new( jive => $self );
 }
 
-#has kit => qw/is ro lazy_build 1/, handles => [qw/ home home_dir /];
-#sub _build_kit {
-#    require Blog::Jive::Kit;
-#    my $self = shift;
-#    my @give;
-#    push @give, uri => $self->uri if $self->uri;
-#    return Blog::Jive::Kit->new( jive => $self, @give );
-#}
+has layout => qw/is ro lazy_build 1/;
+sub _build_layout {
+    require Blog::Jive::Layout;
+    my $self = shift;
+    my $layout = Blog::Jive::Layout->new( jive => $self );
+    $layout->parse( $self->config->{page} || {} ); # TODO Should this be ->{layout} ?
+    return $layout;
+}
 
-#has status => qw/is ro lazy_build 1/;
-#sub _build_status {
-#    require Blog::Jive::Status;
-#    my $self = shift;
-#    # TODO Implement overwrite option
-#    return Blog::Jive::Status->new( jive => $self );
-#}
-
-#sub ready {
-#    my $self = shift;
-#    return $self->status->check_home ? 0 : 1;
-#}
+sub BUILD {
+    my $self = shift;
+    my $given = shift;
+    $self->set_uri( $given->{uri} ) if $given->{uri};
+}
 
 =head1 AUTHOR
 

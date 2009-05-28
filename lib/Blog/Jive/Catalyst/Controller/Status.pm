@@ -5,8 +5,6 @@ use warnings;
 
 use parent qw/Catalyst::Controller/;
 
-use Carp;
-
 #sub report {
 #    my ( $self, $ctx ) = @_;
 #    my $report;

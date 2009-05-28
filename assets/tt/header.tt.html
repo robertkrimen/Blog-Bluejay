@@ -1,5 +1,8 @@
 <div class="header yui-gf">
-    <a href="[% Catalyst.uri_for( '/' ) %]">home</a>
+    [% FOREACH page = jive.layout.pages %]
+    <a href="[% page.uri %]">[% page.label %]</a>
+    [% END %]
+<!--    <a href="[% Catalyst.uri_for( '/' ) %]">home</a>-->
 <!--    <div class="yui-u first">-->
 <!--    </div>-->
 <!--    <div class="yui-u">-->
