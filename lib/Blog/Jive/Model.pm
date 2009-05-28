@@ -9,7 +9,7 @@ use Moose;
 
 extends qw/DBICx::Modeler/;
 
-has jive => qw/is ro required 1 isa Blog::Jive/;
+with qw/Blog::Jive::Component/;
 
 package Blog::Jive::Modeler::Model;
 
