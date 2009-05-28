@@ -2,7 +2,3 @@ Changes
 MANIFEST
 Makefile.PL
 README
-lib/Blog/Jive.pm
-t/00-load.t
-t/pod-coverage.t
-t/pod.t
