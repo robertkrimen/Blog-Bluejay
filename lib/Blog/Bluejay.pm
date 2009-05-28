@@ -45,7 +45,11 @@ sub home {
     return shift->home_dir( @_ );
 }
 sub home_dir {
-    return shift->path_mapper->dir( '/' );
+    my $self = shift;
+    if ( @_ ) {
+        $self->path_mapper->base( shift );
+    }
+    return $self->path_mapper->dir( '/' );
 }
 has path_mapper => qw/is ro lazy_build 1/, handles => [qw/ dir file /];
 sub _build_path_mapper {

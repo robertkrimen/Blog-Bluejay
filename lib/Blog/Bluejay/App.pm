@@ -194,44 +194,80 @@ start [qw/ home=s /], sub {
     }
 };
 
-on 'setup' => undef, sub {
+on 'setup *' => undef, sub {
     my $ctx = shift;
 
-    if ( 1 ) {
+    unless ( @_ ) {
         $ctx->print( <<_END_ );
 Don't overwrite your work, fool!
 _END_
         return
     }
 
-    $ctx->print( <<_END_ );
-\nI will setup in @{[ journal->kit->home_dir ]}
-_END_
+    my ($home, $yes);
 
-    if ( prompt_yn 'Is this okay? Y/n', 'Y' ) {
-
-        bluejay->assets->deploy;
-
-        $ctx->print( "\n" );
-        my $home = bluejay->home;
-        $home = readlink $home if -l $home;
-        File::Find::find( { no_chdir => 1, wanted => sub {
-        
-            return if $_ eq $home;
-            my $size;
-            $size = -s _ if -f $_;
-
-            $ctx->print( "\t", substr $_, 1 + length $home );
-            $ctx->print( " $size" ) if defined $size;
-            $ctx->print( "\n" );
-
-        } }, $home );
-        $ctx->print( "\n" );
-
+    if (@_) {
+        $home = Path::Class::dir( shift );
+        $ctx->bluejay->home( $home );
     }
     else {
-        $ctx->print( "Aborting deploy\n" );
+        $home = $ctx->bluejay->home;
     }
+    $home = $home->absolute;
+
+    if (-d $home) {
+        $ctx->print( <<_END_ );
+\"$home\" already exists and is a directory, do you want to setup anyway?
+_END_
+        if ( prompt_yn 'Is this okay? Y/n', 'Y' ) {
+            $yes = 1;
+        }
+        else {
+            $ctx->print( <<_END_ );
+Aborting deploy
+_END_
+            exit -1;
+        }
+    }
+    elsif (-f $home) {
+        $ctx->print( <<_END_ );
+\"$home\" already exists and is a file, cannot continue setup
+
+Aborting deploy
+_END_
+        exit -1;
+    }
+
+    unless ($yes) {
+        $ctx->print( <<_END_ );
+I will setup in \"$home\"
+_END_
+        $yes = prompt_yn 'Is this okay? Y/n', 'Y';
+    }
+
+    unless ($yes) {
+        $ctx->print( <<_END_ );
+Aborting deploy
+_END_
+        exit -1;
+    }
+
+    $ctx->bluejay->assets->deploy;
+
+    $ctx->print( "\n" );
+    $home = readlink $home if -l $home;
+    File::Find::find( { no_chdir => 1, wanted => sub {
+    
+        return if $_ eq $home;
+        my $size;
+        $size = -s _ if -f $_;
+
+        $ctx->print( "\t", substr $_, 1 + length $home );
+        $ctx->print( " $size" ) if defined $size;
+        $ctx->print( "\n" );
+
+    } }, $home );
+    $ctx->print( "\n" );
 };
 
 on 'publish' => undef, sub {
