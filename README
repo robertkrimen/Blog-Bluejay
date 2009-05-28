@@ -1,5 +1,5 @@
 NAME
-    Blog::Jive
+    Blog::Bluejay
 
 VERSION
     Version 0.01
@@ -9,34 +9,34 @@ AUTHOR
     Robert Krimen, "<rkrimen at cpan.org>"
 
 BUGS
-    Please report any bugs or feature requests to "bug-project-jive at
+    Please report any bugs or feature requests to "bug-project-bluejay at
     rt.cpan.org", or through the web interface at
-    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Project-jive>. I will be
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Project-bluejay>. I will be
     notified, and then you'll automatically be notified of progress on your
     bug as I make changes.
 
 SUPPORT
     You can find documentation for this module with the perldoc command.
 
-        perldoc Blog::Jive
+        perldoc Blog::Bluejay
 
     You can also look for information at:
 
     *   RT: CPAN's request tracker
 
-        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Project-jive>
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Project-bluejay>
 
     *   AnnoCPAN: Annotated CPAN documentation
 
-        <http://annocpan.org/dist/Project-jive>
+        <http://annocpan.org/dist/Project-bluejay>
 
     *   CPAN Ratings
 
-        <http://cpanratings.perl.org/d/Project-jive>
+        <http://cpanratings.perl.org/d/Project-bluejay>
 
     *   Search CPAN
 
-        <http://search.cpan.org/dist/Project-jive/>
+        <http://search.cpan.org/dist/Project-bluejay/>
 
 ACKNOWLEDGEMENTS
 COPYRIGHT & LICENSE

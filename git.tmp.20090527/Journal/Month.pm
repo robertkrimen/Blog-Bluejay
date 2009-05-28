@@ -1,8 +1,8 @@
-package Blog::Jive::Journal::Month;
+package Blog::Bluejay::Journal::Month;
 
 use Moose;
 
-has journal => qw/is ro required 1 isa Blog::Jive::Journal/;
+has journal => qw/is ro required 1 isa Blog::Bluejay::Journal/;
 
 has year => qw/is ro required 1 isa Int/;
 has month => qw/is ro required 1 isa Int/;

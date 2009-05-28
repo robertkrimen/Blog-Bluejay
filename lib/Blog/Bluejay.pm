@@ -1,11 +1,11 @@
-package Blog::Jive;
+package Blog::Bluejay;
 
 use warnings;
 use strict;
 
 =head1 NAME
 
-Blog::Jive 
+Blog::Bluejay 
 
 =head1 VERSION
 
@@ -22,7 +22,7 @@ our $VERSION = '0.01';
 use lib qw/_lib/;
 
 use Moose;
-use Blog::Jive::Carp;
+use Blog::Bluejay::Carp;
 
 use Path::Class();
 use Scalar::Util qw/weaken/;
@@ -30,11 +30,11 @@ use Scalar::Util qw/weaken/;
 has home => qw/reader _home lazy_build 1/;
 sub _build_home {
     my $self = shift;
-    return $ENV{BLOG_JIVE_HOME} if defined $ENV{BLOG_JIVE_HOME};
+    return $ENV{BLOG_BLUEJAY_HOME} if defined $ENV{BLOG_BLUEJAY_HOME};
     $self->guessed_home( 1 );
     # TODO Check for .bluejay (or whatever)
     # TODO Use Find::HomeDir (or whatever)
-    return Path::Class::dir( $ENV{HOME}, '.blog-jive' );
+    return Path::Class::dir( $ENV{HOME}, '.blog-bluejay' );
 }
 has guessed_home => qw/is rw isa Bool default 0/; # TODO Invalid if called before ->home
 sub home_exists {
@@ -74,11 +74,11 @@ sub config {
 
 has cabinet => qw/is ro lazy_build 1/;
 sub _build_cabinet {
-    require Blog::Jive::Cabinet;
+    require Blog::Bluejay::Cabinet;
     require Document::TriPart::Cabinet::Storage::Disk;
     my $self = shift;
     my $storage = Document::TriPart::Cabinet::Storage::Disk->new( dir => $self->dir( 'assets/document' ) );
-    my $cabinet = Blog::Jive::Cabinet->new( jive => $self, storage => $storage );
+    my $cabinet = Blog::Bluejay::Cabinet->new( bluejay => $self, storage => $storage );
     return $cabinet;
 }
 
@@ -124,19 +124,19 @@ _END_
 };
 has schema => qw/is ro lazy_build 1/;
 sub _build_schema {
-    require Blog::Jive::Schema;
+    require Blog::Bluejay::Schema;
     my $self = shift;
-    my $schema = Blog::Jive::Schema->connect( $self->deploy->information );
-    $schema->jive($self);
-    weaken $schema->{jive};
+    my $schema = Blog::Bluejay::Schema->connect( $self->deploy->information );
+    $schema->bluejay($self);
+    weaken $schema->{bluejay};
     return $schema;
 }
 
 has modeler => qw/is ro lazy_build 1/;
 sub _build_modeler {
-    require Blog::Jive::Model;
+    require Blog::Bluejay::Model;
     my $self = shift;
-    my $model = Blog::Jive::Modeler->new( jive => $self, schema => $self->schema, namespace => '+Blog::Jive::Model' );
+    my $model = Blog::Bluejay::Modeler->new( bluejay => $self, schema => $self->schema, namespace => '+Blog::Bluejay::Model' );
     return $model;
 };
 
@@ -147,10 +147,10 @@ sub model {
 
 has assets => qw/is ro lazy_build 1/;
 sub _build_assets {
-    require Blog::Jive::Assets;
+    require Blog::Bluejay::Assets;
     my $self = shift;
     # TODO Implement overwrite option
-    return Blog::Jive::Assets->new( base => $self->home );
+    return Blog::Bluejay::Assets->new( base => $self->home );
 }
 
 has tt => qw/is ro lazy_build 1/;
@@ -164,16 +164,16 @@ sub _build_tt {
 
 has journal => qw/is ro lazy_build 1/, handles => [qw/ post posts create_post /];
 sub _build_journal {
-    require Blog::Jive::Model::Journal;
+    require Blog::Bluejay::Model::Journal;
     my $self = shift;
-    return Blog::Jive::Model::Journal->new( jive => $self );
+    return Blog::Bluejay::Model::Journal->new( bluejay => $self );
 }
 
 has layout => qw/is ro lazy_build 1/;
 sub _build_layout {
-    require Blog::Jive::Layout;
+    require Blog::Bluejay::Layout;
     my $self = shift;
-    my $layout = Blog::Jive::Layout->new( jive => $self );
+    my $layout = Blog::Bluejay::Layout->new( bluejay => $self );
     $layout->parse( $self->config->{page} || {} ); # TODO Should this be ->{layout} ?
     return $layout;
 }
@@ -190,8 +190,8 @@ Robert Krimen, C<< <rkrimen at cpan.org> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-project-jive at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Project-jive>.  I will be notified, and then you'll
+Please report any bugs or feature requests to C<bug-project-bluejay at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Project-bluejay>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 
@@ -201,7 +201,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Blog::Jive
+    perldoc Blog::Bluejay
 
 
 You can also look for information at:
@@ -210,19 +210,19 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Project-jive>
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Project-bluejay>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/Project-jive>
+L<http://annocpan.org/dist/Project-bluejay>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/Project-jive>
+L<http://cpanratings.perl.org/d/Project-bluejay>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Project-jive/>
+L<http://search.cpan.org/dist/Project-bluejay/>
 
 =back
 
@@ -240,4 +240,4 @@ under the same terms as Perl itself.
 
 =cut
 
-1; # End of Blog::Jive
+1; # End of Blog::Bluejay

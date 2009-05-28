@@ -32,7 +32,7 @@ pod2usage(1) if ( $help || !$ARGV[0] );
 
 my $helper = Catalyst::Helper->new( { '.newfiles' => !$force, mech => $mech } );
 
-pod2usage(1) unless $helper->mk_component( 'Blog::Jive::Catalyst', @ARGV );
+pod2usage(1) unless $helper->mk_component( 'Blog::Bluejay::Catalyst', @ARGV );
 
 1;
 

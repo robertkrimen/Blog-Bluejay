@@ -1,4 +1,4 @@
-package Blog::Jive::Catalyst::Controller::Mock;
+package Blog::Bluejay::Catalyst::Controller::Mock;
 
 use strict;
 use warnings;

@@ -1,14 +1,14 @@
-package Blog::Jive::Cabinet;
+package Blog::Bluejay::Cabinet;
 
 use Moose;
 
 extends qw/Document::TriPart::Cabinet/;
 
-with qw/Blog::Jive::Component/;
+with qw/Blog::Bluejay::Component/;
 
-has '+document_class' => (default => 'Blog::Jive::Cabinet::Document');
+has '+document_class' => (default => 'Blog::Bluejay::Cabinet::Document');
 
-package Blog::Jive::Cabinet::Document;
+package Blog::Bluejay::Cabinet::Document;
 
 use Moose;
 
@@ -22,7 +22,7 @@ after save => sub {
     my $uuid = $self->uuid;
     my $header = $self->header;
 
-    $self->cabinet->jive->model( 'Post' )->update_or_create( {
+    $self->cabinet->bluejay->model( 'Post' )->update_or_create( {
         uuid => $self->uuid,
         creation => $creation,
         modification => $modification,

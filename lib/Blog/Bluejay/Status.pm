@@ -1,11 +1,11 @@
-package Blog::Jive::Status;
+package Blog::Bluejay::Status;
 
 use warnings;
 use strict;
 
 use Moose;
 
-with qw/Blog::Jive::Component/;
+with qw/Blog::Bluejay::Component/;
 
 sub report {
     my $self = shift;
@@ -20,7 +20,7 @@ sub report {
 sub check_home {
     my $self = shift;
     
-    my $home = $self->jive->home;
+    my $home = $self->bluejay->home;
 
     return 'home-missing' unless -e $home;
     return 'home-not-directory' unless -d _;

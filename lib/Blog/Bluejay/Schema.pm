@@ -1,4 +1,4 @@
-package Blog::Jive::Schema;
+package Blog::Bluejay::Schema;
 
 use strict;
 use warnings;
@@ -6,10 +6,10 @@ use warnings;
 use base qw/DBIx::Class::Schema Class::Accessor::Fast/;
 our $schema = __PACKAGE__;
 
-__PACKAGE__->mk_accessors(qw/jive/);
+__PACKAGE__->mk_accessors(qw/bluejay/);
 __PACKAGE__->load_namespaces;
 
-package Blog::Jive::Schema::Result::Post;
+package Blog::Bluejay::Schema::Result::Post;
 
 use strict;
 use warnings;

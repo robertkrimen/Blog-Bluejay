@@ -23,4 +23,4 @@ reset: clean
 	$(MAKE) test
 
 pack:
-	tpage --include_path assets_embed --include_path assets/tt Embed.pm > lib/Blog/Jive/Assets/Embed.pm
+	tpage --include_path assets_embed --include_path assets/tt Embed.pm > lib/Blog/Bluejay/Assets/Embed.pm

@@ -1,9 +1,9 @@
-package Blog::Jive::App::Journal;
+package Blog::Bluejay::App::Journal;
 
 use strict;
 use warnings;
 
-use Blog::Jive;
+use Blog::Bluejay;
 
 use Getopt::Chain;
 use Data::UUID::LibUUID;
@@ -16,8 +16,8 @@ use Text::ASCIITable;
 
 local $Term::Prompt::MULTILINE_INDENT = undef;
 
-my $jive = Blog::Jive->new;
-my $journal = $jive->journal;
+my $bluejay = Blog::Bluejay->new;
+my $journal = $bluejay->journal;
 my $cabinet = $journal->cabinet;
 
 sub abort(@) {
@@ -252,7 +252,7 @@ __END__
 #            rescan => sub {
 #                my $context = shift;
 #                
-#                my $dir = $jive->kit->home_dir->subdir( qw/assets journal/ );
+#                my $dir = $bluejay->kit->home_dir->subdir( qw/assets journal/ );
 #                $dir->recurse(callback => sub {
 #                    my $file = shift;
 #                    return unless -d $file;

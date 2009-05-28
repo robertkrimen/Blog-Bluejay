@@ -1,10 +1,10 @@
-package Blog::Jive::Layout;
+package Blog::Bluejay::Layout;
 
 use Moose;
 use MooseX::AttributeHelpers;
-use Blog::Jive::Carp
+use Blog::Bluejay::Carp
 
-with qw/Blog::Jive::Component/;
+with qw/Blog::Bluejay::Component/;
 
 has page_map => qw/is ro isa HashRef/, default => sub { {} };
 sub page {
@@ -49,12 +49,12 @@ sub _new_page {
 
     my ( $class, $label, $path );
 
-    $class = 'Blog::Jive::Layout::TemplatePage';
+    $class = 'Blog::Bluejay::Layout::TemplatePage';
     $label = $page_blueprint->{label};
     undef $label if defined $label && ! length $label; # Blech
 
     if ( $name eq 'journal' ) {
-        $class = 'Blog::Jive::Layout::JournalPage';
+        $class = 'Blog::Bluejay::Layout::JournalPage';
         $path = '' unless $self->home;
     }
     elsif ( $name eq 'home' ) {
@@ -69,14 +69,14 @@ sub _new_page {
     return $page;
 }
 
-package Blog::Jive::Layout::Page;
+package Blog::Bluejay::Layout::Page;
 
 use Moose;
 
-has layout => qw/is ro required 1 isa Blog::Jive::Layout/;
-has jive => qw/is ro lazy_build 1/;
-sub _build_jive {
-    return shift->layout->jive;
+has layout => qw/is ro required 1 isa Blog::Bluejay::Layout/;
+has bluejay => qw/is ro lazy_build 1/;
+sub _build_bluejay {
+    return shift->layout->bluejay;
 }
 has label => qw/is rw isa Str required 1/;
 has rank => qw/is rw isa Int required 1/;
@@ -94,14 +94,14 @@ sub _build_path {
 has uri => qw/is rw isa URI::PathAbstract lazy_build 1/;
 sub _build_uri {
     my $self = shift;
-    return $self->jive->uri->child( $self->path );
+    return $self->bluejay->uri->child( $self->path );
 }
 
-package Blog::Jive::Layout::TemplatePage;
+package Blog::Bluejay::Layout::TemplatePage;
 
 use Moose;
 
-extends qw/Blog::Jive::Layout::Page/;
+extends qw/Blog::Bluejay::Layout::Page/;
 
 has template => qw/is rw Str lazy_build 1/;
 sub _build_template {
@@ -121,11 +121,11 @@ sub render {
     );
 }
 
-package Blog::Jive::Layout::JournalPage;
+package Blog::Bluejay::Layout::JournalPage;
 
 use Moose;
 
-extends qw/Blog::Jive::Layout::Page/;
+extends qw/Blog::Bluejay::Layout::Page/;
 
 sub render {
     my $self = shift;
@@ -134,7 +134,7 @@ sub render {
     $catalyst->stash(
         page => $self,
         template => 'page/posts.tt.html',
-        posts => [ $self->jive->journal->posts ],
+        posts => [ $self->bluejay->journal->posts ],
     );
 }
 

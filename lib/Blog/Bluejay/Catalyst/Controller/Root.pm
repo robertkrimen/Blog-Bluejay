@@ -1,4 +1,4 @@
-package Blog::Jive::Catalyst::Controller::Root;
+package Blog::Bluejay::Catalyst::Controller::Root;
 
 use strict;
 use warnings;
@@ -11,7 +11,7 @@ use Moose;
 use YUI::Loader;
 use jQuery::Loader;
 use File::Assets;
-use Blog::Jive;
+use Blog::Bluejay;
 use Text::Lorem::More;
 
 sub auto :Private {
@@ -23,7 +23,7 @@ sub auto :Private {
     my $assets = $stash->{assets} = File::Assets->new( base => { dir =>  $ctx->path_to, uri => $ctx->uri_for, } );
 
     $ctx->stash(
-        jive => $ctx->jive,
+        bluejay => $ctx->bluejay,
         journal => $ctx->journal,
         layout => $ctx->layout,
     );

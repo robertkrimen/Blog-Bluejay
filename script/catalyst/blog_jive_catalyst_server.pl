@@ -54,9 +54,9 @@ if ( $debug ) {
 
 # This is require instead of use so that the above environment
 # variables can be set at runtime.
-require Blog::Jive::Catalyst;
+require Blog::Bluejay::Catalyst;
 
-Blog::Jive::Catalyst->run( $port, $host, {
+Blog::Bluejay::Catalyst->run( $port, $host, {
     argv              => \@argv,
     'fork'            => $fork,
     keepalive         => $keepalive,

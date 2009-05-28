@@ -1,9 +1,9 @@
-package Blog::Jive::Catalyst;
+package Blog::Bluejay::Catalyst;
 
 use strict;
 use warnings;
 
-use Blog::Jive;
+use Blog::Bluejay;
 
 use Catalyst::Runtime '5.70';
 
@@ -16,7 +16,7 @@ our $VERSION = '0.01';
 my @include_path;
 
 __PACKAGE__->config(
-    name => 'Blog::Jive::Catalyst',
+    name => 'Blog::Bluejay::Catalyst',
     root => __PACKAGE__->path_to( qw/assets root/ ),
     'static' => {
         dirs => [qw/ static /],
@@ -33,19 +33,19 @@ __PACKAGE__->config(
 
 __PACKAGE__->setup();
 
-sub jive {
+sub bluejay {
     my $self = shift;
-    return $self->model( 'Jive' );
+    return $self->model( 'Bluejay' );
 }
 
 sub layout {
     my $self = shift;
-    return $self->jive->layout;
+    return $self->bluejay->layout;
 }
 
 sub journal {
     my $self = shift;
-    return $self->jive->journal;
+    return $self->bluejay->journal;
 }
 
 1;

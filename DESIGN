@@ -1,15 +1,15 @@
 ---
-When the user runs 'blog-jive' for the first time, it will show basic commands and a synopsis of what they should do:
+When the user runs 'blog-bluejay' for the first time, it will show basic commands and a synopsis of what they should do:
 
-    "More information can be found using: blog-jive help"
+    "More information can be found using: blog-bluejay help"
 
-This information should be available under 'blog-jive synopsis', hide it unless the home directory doesn't exist. (help synposis)
+This information should be available under 'blog-bluejay synopsis', hide it unless the home directory doesn't exist. (help synposis)
 
 ---
-If the user edits or launches a server without first setting up jive home, then create it for them and say that we did
+If the user edits or launches a server without first setting up bluejay home, then create it for them and say that we did
 Provide a flag to suppress the automatic-setup behavior: --no-setup
 
-Do not launch the server unless we can verify that appropiate assets exist (provide a force flag): blog-jive server --force
+Do not launch the server unless we can verify that appropiate assets exist (provide a force flag): blog-bluejay server --force
 
 ---
-Tell the user how to customize their install with 'blog-jive customize' (help customize)
+Tell the user how to customize their install with 'blog-bluejay customize' (help customize)

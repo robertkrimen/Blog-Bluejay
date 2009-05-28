@@ -1,8 +1,8 @@
-package Blog::Jive::Journal::Overview;
+package Blog::Bluejay::Journal::Overview;
 
 use Moose;
 
-has journal => qw/is ro required 1 isa Blog::Jive::Journal/;
+has journal => qw/is ro required 1 isa Blog::Bluejay::Journal/;
 
 has posts => qw/is ro lazy_build 1 isa ArrayRef/;
 sub _build_posts {

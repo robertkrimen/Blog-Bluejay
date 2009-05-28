@@ -7,11 +7,11 @@ use Test::Most;
 
 plan qw/no_plan/;
 
-use Blog::Jive;
+use Blog::Bluejay;
 
 {
-    local $ENV{BLOG_JIVE_HOME} = 'null';
+    local $ENV{BLOG_BLUEJAY_HOME} = 'null';
 
-    my $jive = Blog::Jive->new;
-    is( $jive->home, 'null' );
+    my $bluejay = Blog::Bluejay->new;
+    is( $bluejay->home, 'null' );
 }

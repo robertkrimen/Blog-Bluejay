@@ -1,4 +1,4 @@
-package Blog::Jive::Catalyst::View::TT;
+package Blog::Bluejay::Catalyst::View::TT;
 
 use strict;
 use base 'Catalyst::View::TT';

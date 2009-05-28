@@ -1,4 +1,4 @@
-package Blog::Jive::App::help;
+package Blog::Bluejay::App::help;
 
 use Getopt::Chain::Declare::under 'help';
 
@@ -6,7 +6,7 @@ use Text::Chomped;
 
 sub usage {
     return chomped <<_END_
-Usage: blog-jive [--home=HOME] COMMAND [OPTIONS]
+Usage: blog-bluejay [--home=HOME] COMMAND [OPTIONS]
 _END_
 }
 
@@ -37,17 +37,17 @@ on '' => undef, sub {
 
 You can get more help via:
 
-    synopsis    A Blog::Jive command-line synopsis
+    synopsis    A Blog::Bluejay command-line synopsis
 
 ---
 
     You can control the blog home directory with the --home option:
 
-        blog-jive --home <home> ...
+        blog-bluejay --home <home> ...
 
-    Or by setting BLOG_JIVE_HOME
+    Or by setting BLOG_BLUEJAY_HOME
 
-        BLOG_JIVE_HOME=<home> blog-jive ...
+        BLOG_BLUEJAY_HOME=<home> blog-bluejay ...
 
 _END_
 };
@@ -63,29 +63,29 @@ sub do_synopsis ($) {
     $ctx->print( <<_END_ );
 @{[ usage ]}
 
-    To setup a new blog in \$HOME/.blog-jive, run:
+    To setup a new blog in \$HOME/.blog-bluejay, run:
     
-        blog-jive setup
+        blog-bluejay setup
 
     Create a new post with:
 
-        blog-jive edit <title>
+        blog-bluejay edit <title>
 
     Edit a post with:
     
-        blog-jive edit <uuid>
+        blog-bluejay edit <uuid>
 
     Launch your blog server with:
 
-        blog-jive server
+        blog-bluejay server
 
     To see this help again:
 
-        blog-jive help synopsis
+        blog-bluejay help synopsis
 
     For more help:
 
-        blog-jive help
+        blog-bluejay help
 
 _END_
 }

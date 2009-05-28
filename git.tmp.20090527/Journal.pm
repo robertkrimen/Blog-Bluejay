@@ -1,4 +1,4 @@
-package Blog::Jive::Journal;
+package Blog::Bluejay::Journal;
 
 use strict;
 use warnings;
@@ -6,13 +6,13 @@ use warnings;
 use Moose;
 use Carp::Clan; # TODO Carp::Clan::Share
 
-with qw/Blog::Jive::Component/;
+with qw/Blog::Bluejay::Component/;
 
 has overview => qw/is ro lazy_build 1/;
 sub _build_overview {
-    require Blog::Jive::Journal::Overview;
+    require Blog::Bluejay::Journal::Overview;
     my $self = shift;
-    return Blog::Jive::Journal::Overview->new( journal => $self );
+    return Blog::Bluejay::Journal::Overview->new( journal => $self );
 }
 
 sub uuid_path {
@@ -35,10 +35,10 @@ sub posts_for_month {
 }
 
 sub month {
-    require Blog::Jive::Journal::Month;
+    require Blog::Bluejay::Journal::Month;
     my $self = shift;
     my $month = shift;
-    $month = Blog::Jive::Journal::Month->parse($month, journal => $self);
+    $month = Blog::Bluejay::Journal::Month->parse($month, journal => $self);
     return $month;
 }
 

@@ -8,20 +8,20 @@ use Test::Most;
 plan qw/no_plan/;
 
 use Directory::Scratch;
-use Blog::Jive;
-use Blog::Jive::App;
+use Blog::Bluejay;
+use Blog::Bluejay::App;
 
-my ($scratch, $jive);
+my ($scratch, $bluejay);
 
 $scratch = Directory::Scratch->new;
-$jive = Blog::Jive->new( home => $scratch->dir( qw/.blog-jive/ ) );
-$ENV{BLOG_JIVE_HOME} = $jive->home;
-$Blog::Jive::App::Catalyst::TEST = 1;
+$bluejay = Blog::Bluejay->new( home => $scratch->dir( qw/.blog-bluejay/ ) );
+$ENV{BLOG_BLUEJAY_HOME} = $bluejay->home;
+$Blog::Bluejay::App::Catalyst::TEST = 1;
 
-ok( ! $jive->home_exists );
+ok( ! $bluejay->home_exists );
 
-Blog::Jive::App->new->run([qw/ server /]);
+Blog::Bluejay::App->new->run([qw/ server /]);
 
-ok( $jive->home_exists );
-ok( -f $jive->file( 'assets/tt/frame.tt.html' ) );
+ok( $bluejay->home_exists );
+ok( -f $bluejay->file( 'assets/tt/frame.tt.html' ) );
 

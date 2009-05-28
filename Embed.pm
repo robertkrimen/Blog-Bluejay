@@ -1,4 +1,4 @@
-package Blog::Jive::Assets::Embed;
+package Blog::Bluejay::Assets::Embed;
 
 use strict;
 use warnings;

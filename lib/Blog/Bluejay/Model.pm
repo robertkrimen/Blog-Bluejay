@@ -1,37 +1,37 @@
-package Blog::Jive::Model;
+package Blog::Bluejay::Model;
 
 use strict;
 use warnings;
 
-package Blog::Jive::Modeler;
+package Blog::Bluejay::Modeler;
 
 use Moose;
 
 extends qw/DBICx::Modeler/;
 
-with qw/Blog::Jive::Component/;
+with qw/Blog::Bluejay::Component/;
 
-package Blog::Jive::Modeler::Model;
+package Blog::Bluejay::Modeler::Model;
 
 use Moose::Role;
 
-has jive => qw/is ro lazy_build 1/;
-sub _build_jive {
-    return shift->_model__modeler->jive; # Doing this sort of access in the model is horribly ugly
+has bluejay => qw/is ro lazy_build 1/;
+sub _build_bluejay {
+    return shift->_model__modeler->bluejay; # Doing this sort of access in the model is horribly ugly
 }
 
-package Blog::Jive::Model::Post;
+package Blog::Bluejay::Model::Post;
 
 use DBICx::Modeler::Model;
 
-with qw/Blog::Jive::Modeler::Model/;
+with qw/Blog::Bluejay::Modeler::Model/;
 
 use DateTimeX::Easy qw/datetime/;
 
 has uri => qw/is ro lazy_build 1/;
 sub _build_uri {
     my $self = shift;
-    return $self->jive->uri->child( qw/ journal /, join '-', lc $self->safe_title, $self->uuid );
+    return $self->bluejay->uri->child( qw/ journal /, join '-', lc $self->safe_title, $self->uuid );
 }
 
 has safe_title => qw/is ro lazy_build 1 isa Str/;
@@ -47,13 +47,13 @@ sub _build_safe_title {
 has document => qw/is ro lazy_build 1/, handles => [qw/ edit /];
 sub _build_document {
     my $self = shift;
-    return $self->jive->cabinet->load( $self->uuid );
+    return $self->bluejay->cabinet->load( $self->uuid );
 }
 
 has assets_dir => qw/is ro lazy_build 1/;
 sub _build_assets_dir {
     my $self = shift;
-    return $self->jive->cabinet->storage->assets_dir( $self->uuid );
+    return $self->bluejay->cabinet->storage->assets_dir( $self->uuid );
 }
 
 has creation => qw/is ro lazy_build 1/;
@@ -71,10 +71,10 @@ sub _build_local_creation {
 has body => qw/is ro lazy_build 1/;
 sub _build_body {
     my $self = shift;
-    return Blog::Jive::Model::Post::Body->new( post => $self );
+    return Blog::Bluejay::Model::Post::Body->new( post => $self );
 }
 
-package Blog::Jive::Model::Post::Body;
+package Blog::Bluejay::Model::Post::Body;
 
 use Moose;
 
@@ -103,7 +103,7 @@ sub _build_render {
 
     my $render = $self->raw;
     if ($type =~ m/\btt\b/) {
-        my $tt = $self->post->jive->tt;
+        my $tt = $self->post->bluejay->tt;
         my $ASSETS = join '/', $self->post->assets_dir->dir_list(-3);
         my $input = \$render;
         my $output;

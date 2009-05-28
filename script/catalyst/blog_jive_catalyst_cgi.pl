@@ -6,9 +6,9 @@ use strict;
 use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use Blog::Jive::Catalyst;
+use Blog::Bluejay::Catalyst;
 
-Blog::Jive::Catalyst->run;
+Blog::Bluejay::Catalyst->run;
 
 1;
 

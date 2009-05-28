@@ -1,9 +1,9 @@
-package Blog::Jive::App;
+package Blog::Bluejay::App;
 
 use strict;
 use warnings;
 
-use Blog::Jive;
+use Blog::Bluejay;
 
 use Data::UUID::LibUUID;
 use Carp;
@@ -18,13 +18,13 @@ use Text::ASCIITable;
 
 our $PRINT = sub { print @_ };
 
-package Blog::Jive::AppContext;
+package Blog::Bluejay::AppContext;
 
 use Moose;
 extends qw/Getopt::Chain::Context/;
 
-sub jive {
-    return &Blog::Jive::App::jive;
+sub bluejay {
+    return &Blog::Bluejay::App::bluejay;
 }
 
 sub print {
@@ -32,14 +32,14 @@ sub print {
     $PRINT->( @_ );
 }
 
-package Blog::Jive::App;
+package Blog::Bluejay::App;
 
-my @jive;
+my @bluejay;
 
 {
-    my $jive;
-    sub jive {
-        return $jive ||= Blog::Jive->new( @jive, @_ );
+    my $bluejay;
+    sub bluejay {
+        return $bluejay ||= Blog::Bluejay->new( @bluejay, @_ );
     }
 }
 
@@ -78,7 +78,7 @@ sub find ($@) {
     my ($folder, $title) = folder_title @criteria;
 
     my ($search, $post, $count);
-    $search = $ctx->jive->posts(
+    $search = $ctx->bluejay->posts(
         [ 
             { title => $criteria },
             { folder => $folder, title => $title },
@@ -101,7 +101,7 @@ sub do_list ($;$) {
     my $ctx = shift;
     my $search = shift;
 
-    $search = scalar $ctx->jive->posts unless $search;
+    $search = scalar $ctx->bluejay->posts unless $search;
     my @posts = $search->search( undef, { order_by => [qw/ creation /] } )->all;
 
     my $tb = Text::ASCIITable->new({ hide_HeadLine => 1 });
@@ -112,13 +112,13 @@ sub do_list ($;$) {
 
 sub do_usage ($) {
     my $ctx = shift;
-    Blog::Jive::App::help::do_usage $ctx;
+    Blog::Bluejay::App::help::do_usage $ctx;
 }
 
 sub do_new ($$$) {
     my ($ctx, $folder, $title) = @_;
 
-    my $document = $ctx->jive->cabinet->create;
+    my $document = $ctx->bluejay->cabinet->create;
     $document->header->{title} = $title;
     $document->header->{folder} = $folder;
     $document->edit;
@@ -159,12 +159,12 @@ sub prompt_yn ($$) {
 sub do_no_command ($) {
     my $ctx = shift;
 
-    if ( jive->home_exists ) {
+    if ( bluejay->home_exists ) {
         do_usage $ctx;
         do_list $ctx;
     }
     else {
-        &Blog::Jive::App::help::do_synopsis( $ctx );
+        &Blog::Bluejay::App::help::do_synopsis( $ctx );
     }
 
     exit -1;
@@ -176,17 +176,17 @@ sub do_no_command ($) {
 
 use Getopt::Chain::Declare;
 
-context 'Blog::Jive::AppContext';
+context 'Blog::Bluejay::AppContext';
 
 start [qw/ home=s /], sub {
     my $ctx = shift;
 
     if (defined ( my $home = $ctx->option( 'home' ) ) ) {
-        push @jive, home => $home;
+        push @bluejay, home => $home;
     }
 
     $ctx->stash(
-        jive => jive,
+        bluejay => bluejay,
     );
 
     if ( $ctx->last ) {
@@ -210,10 +210,10 @@ _END_
 
     if ( prompt_yn 'Is this okay? Y/n', 'Y' ) {
 
-        jive->assets->deploy;
+        bluejay->assets->deploy;
 
         $ctx->print( "\n" );
-        my $home = jive->home;
+        my $home = bluejay->home;
         $home = readlink $home if -l $home;
         File::Find::find( { no_chdir => 1, wanted => sub {
         
@@ -260,13 +260,13 @@ on 'edit *' => undef, sub {
 on 'load' => undef, sub {
     my $ctx = shift;
 
-    $ctx->jive->dir( 'assets/document' )->recurse(callback => sub {
+    $ctx->bluejay->dir( 'assets/document' )->recurse(callback => sub {
         my $file = shift;
         return unless -d $file;
         return unless $file->dir_list(-1) =~ m/^($Document::TriPart::Cabinet::UUID::re)$/;
         my $uuid = $1;
         warn "$uuid => $file\n";
-        my $document = $ctx->jive->cabinet->load( $uuid );
+        my $document = $ctx->bluejay->cabinet->load( $uuid );
         $document->save;
     });
 };
@@ -275,9 +275,9 @@ on 'status' => undef, sub {
     my $ctx = shift;
 
     my ($problem);
-    $ctx->print( "home = ", jive->home);
-    $ctx->print( " (guessed)") if $ctx->jive->guessed_home;
-    $ctx->print( " ($problem)") if defined ($problem = $ctx->jive->status->check_home); 
+    $ctx->print( "home = ", bluejay->home);
+    $ctx->print( " (guessed)") if $ctx->bluejay->guessed_home;
+    $ctx->print( " ($problem)") if defined ($problem = $ctx->bluejay->status->check_home); 
     $ctx->print( "\n" );
 };
 
@@ -287,15 +287,15 @@ on 'list' => undef, sub {
     do_list $ctx;
 };
 
-require Blog::Jive::App::Catalyst;
-require Blog::Jive::App::help;
+require Blog::Bluejay::App::Catalyst;
+require Blog::Bluejay::App::help;
 
 on qr/.*/ => undef, sub {
     my $ctx = shift;
     my $command = $ctx->command;
 
     if ($command) {
-        $ctx->print( "blog-jive: Unknown command \"$command\"\n\n" );
+        $ctx->print( "blog-bluejay: Unknown command \"$command\"\n\n" );
     }
 
     do_usage $ctx;
@@ -438,7 +438,7 @@ __END__
 #            rescan => sub {
 #                my $context = shift;
 #                
-#                my $dir = $jive->kit->home_dir->subdir( qw/assets journal/ );
+#                my $dir = $bluejay->kit->home_dir->subdir( qw/assets journal/ );
 #                $dir->recurse(callback => sub {
 #                    my $file = shift;
 #                    return unless -d $file;

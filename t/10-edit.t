@@ -8,18 +8,18 @@ use Test::Most;
 plan qw/no_plan/;
 
 use Directory::Scratch;
-use Blog::Jive;
+use Blog::Bluejay;
 
-my ($scratch, $jive, $document, $post, $uuid);
+my ($scratch, $bluejay, $document, $post, $uuid);
 
 $scratch = Directory::Scratch->new;
-$jive = Blog::Jive->new( home => $scratch->dir( qw/.blog-jive/ ) );
+$bluejay = Blog::Bluejay->new( home => $scratch->dir( qw/.blog-bluejay/ ) );
 
-$document = $jive->cabinet->create;
+$document = $bluejay->cabinet->create;
 ok( $uuid = $document->uuid );
 $document->save;
 
-ok( $post = $jive->post( $uuid ) );
+ok( $post = $bluejay->post( $uuid ) );
 is( $post->body->render, undef ); # TODO Should this always be something?
 #is( $post->body->render, <<_END_ );
 #_END_
@@ -30,7 +30,7 @@ type: markdown
 The *quick* brown fox jumped over the **lazy** dog
 _END_
 
-ok( $post = $jive->post( $uuid ) );
+ok( $post = $bluejay->post( $uuid ) );
 is( $post->body->render, <<_END_ );
 <p>The <em>quick</em> brown fox jumped over the <strong>lazy</strong> dog</p>
 _END_
@@ -47,7 +47,7 @@ Lorem *ipsum*
 The *quick* brown fox jumped over the **lazy** dog
 _END_
 
-ok( $post = $jive->post( $uuid ) );
+ok( $post = $bluejay->post( $uuid ) );
 is( $post->body->render, <<_END_ );
 <p>Lorem <em>ipsum</em></p>
 

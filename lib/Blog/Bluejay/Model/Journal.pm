@@ -1,8 +1,8 @@
-package Blog::Jive::Model::Journal;
+package Blog::Bluejay::Model::Journal;
 
 use Moose;
 
-has jive => qw/is ro required 1/;
+has bluejay => qw/is ro required 1/;
 
 sub posts {
     my $self = shift;
@@ -10,14 +10,14 @@ sub posts {
     
     @search = ( undef, { order_by => 'creation DESC' } ) unless @search;
 
-    return $self->jive->model( 'Post' )->search( @search );
+    return $self->bluejay->model( 'Post' )->search( @search );
 }
 
 sub post {
     my $self = shift;
     my $uuid = shift;
 
-    my ($post) = $self->jive->model( 'Post' )->search( { uuid => $uuid } )->slice( 0 );
+    my ($post) = $self->bluejay->model( 'Post' )->search( { uuid => $uuid } )->slice( 0 );
     return $post;
 }
 

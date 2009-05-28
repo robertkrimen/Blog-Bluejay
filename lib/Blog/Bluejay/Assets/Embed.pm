@@ -1,4 +1,4 @@
-package Blog::Jive::Assets::Embed;
+package Blog::Bluejay::Assets::Embed;
 
 use strict;
 use warnings;
@@ -22,12 +22,12 @@ use warnings;
 
 [% WRAPPER frame.tt.html %]
 
-[% status = jive.status.check_home %]
+[% status = bluejay.status.check_home %]
 [% IF status %]
 [% ELSE %]
 <code><pre>
 
-    The home directory for this installation is <b>[% jive.home %]</b>
+    The home directory for this installation is <b>[% bluejay.home %]</b>
 
 </pre></code>
 

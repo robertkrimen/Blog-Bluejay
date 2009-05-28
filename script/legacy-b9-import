@@ -3,12 +3,12 @@
 use strict;
 use warnings;
 
-use Blog::Jive;
+use Blog::Bluejay;
 use Path::Class;
 use Document::TriPart::Cabinet;
 
-my $jive = Blog::Jive->new;
-my $journal = $jive->journal;
+my $bluejay = Blog::Bluejay->new;
+my $journal = $bluejay->journal;
 my $cabinet = $journal->cabinet;
 
 my $dir = dir 'legacy-cabinet';

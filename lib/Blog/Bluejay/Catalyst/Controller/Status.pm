@@ -1,4 +1,4 @@
-package Blog::Jive::Catalyst::Controller::Status;
+package Blog::Bluejay::Catalyst::Controller::Status;
 
 use strict;
 use warnings;
@@ -9,7 +9,7 @@ use parent qw/Catalyst::Controller/;
 #    my ( $self, $ctx ) = @_;
 #    my $report;
 #    unless ($report = $ctx->stash->{status_report}) {
-#        $report = [ $ctx->model( 'Jive' )->status->report ];
+#        $report = [ $ctx->model( 'Bluejay' )->status->report ];
 #    }
 #    return @{ $report };
 #}
@@ -67,16 +67,16 @@ sub _tree($) {
 sub default :Private {
     my ( $self, $ctx ) = @_;
     
-    my $jive = $ctx->stash->{jive};
+    my $bluejay = $ctx->stash->{bluejay};
 
-    if ( $jive->ready ) {
+    if ( $bluejay->ready ) {
         $ctx->stash(
-            tree => _tree $jive->home,
+            tree => _tree $bluejay->home,
         );
     }
 
     $ctx->stash(
-#        template => $jive->assets->embed->{'tt/status/status.tt.html'},
+#        template => $bluejay->assets->embed->{'tt/status/status.tt.html'},
         template => 'status/status.tt.html',
     );
 }

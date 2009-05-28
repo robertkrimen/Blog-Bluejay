@@ -8,22 +8,22 @@ use Test::Most;
 plan qw/no_plan/;
 
 use Directory::Scratch;
-use Blog::Jive;
+use Blog::Bluejay;
 
-my ($scratch, $jive);
+my ($scratch, $bluejay);
 
 ok( 1 ) and exit;
 
 __END__
 
 $scratch = Directory::Scratch->new;
-$jive = Blog::Jive->new( home => $scratch->dir( qw/home/ ) );
+$bluejay = Blog::Bluejay->new( home => $scratch->dir( qw/home/ ) );
 
-is( $jive->status->check_home, 'home-missing' );
-ok( ! $jive->guessed_home );
+is( $bluejay->status->check_home, 'home-missing' );
+ok( ! $bluejay->guessed_home );
 
 # TODO: Check accessible, is directory
 
-$jive->assets->deploy;
+$bluejay->assets->deploy;
 
-is( $jive->status->check_home, undef );
+is( $bluejay->status->check_home, undef );

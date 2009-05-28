@@ -3,6 +3,6 @@
 use strict;
 use warnings;
 
-(require Blog::Jive::App)->new->run;
+(require Blog::Bluejay::App)->new->run;
 
 1;

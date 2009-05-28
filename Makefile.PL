@@ -1,7 +1,7 @@
 use inc::Module::Install;
 
-name     'Blog-Jive';
-all_from 'lib/Blog/Jive.pm';
+name     'Blog-Bluejay';
+all_from 'lib/Blog/Bluejay.pm';
 author   'Robert Krimen <rkrimen@cpan.org>';
 license  'perl';
 

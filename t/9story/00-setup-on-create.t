@@ -8,16 +8,16 @@ use Test::Most;
 plan qw/no_plan/;
 
 use Directory::Scratch;
-use Blog::Jive;
+use Blog::Bluejay;
 
-my ($scratch, $jive);
+my ($scratch, $bluejay);
 
 $scratch = Directory::Scratch->new;
-$jive = Blog::Jive->new( home => $scratch->dir( qw/.blog-jive/ ) );
+$bluejay = Blog::Bluejay->new( home => $scratch->dir( qw/.blog-bluejay/ ) );
 
-ok( ! $jive->home_exists );
+ok( ! $bluejay->home_exists );
 
-my $document = $jive->cabinet->create;
+my $document = $bluejay->cabinet->create;
 $document->edit( \"" );
 
-ok( $jive->home_exists );
+ok( $bluejay->home_exists );

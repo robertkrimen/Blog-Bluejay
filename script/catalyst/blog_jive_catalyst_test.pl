@@ -6,7 +6,7 @@ use Getopt::Long;
 use Pod::Usage;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
-use Catalyst::Test 'Blog::Jive::Catalyst';
+use Catalyst::Test 'Blog::Bluejay::Catalyst';
 
 my $help = 0;
 

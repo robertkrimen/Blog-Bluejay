@@ -1,4 +1,4 @@
-package Blog::Jive::Assets;
+package Blog::Bluejay::Assets;
 
 use strict;
 use warnings;
@@ -104,8 +104,8 @@ use Moose;
 
 has embed => qw/is ro lazy_build 1/;
 sub _build_embed {
-    require Blog::Jive::Assets::Embed;
-    Blog::Jive::Assets::Embed->catalog;
+    require Blog::Bluejay::Assets::Embed;
+    Blog::Bluejay::Assets::Embed->catalog;
 }
 # TODO Add reporting option/return manifest
 
