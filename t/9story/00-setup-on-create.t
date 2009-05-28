@@ -17,7 +17,7 @@ $jive = Blog::Jive->new( home => $scratch->dir( qw/.blog-jive/ ) );
 
 ok( ! $jive->home_exists );
 
-my $document = $jive->journal->cabinet->create;
+my $document = $jive->cabinet->create;
 $document->edit( \"" );
 
 ok( $jive->home_exists );

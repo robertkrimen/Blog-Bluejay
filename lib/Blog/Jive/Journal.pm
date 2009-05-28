@@ -8,96 +8,6 @@ use Carp::Clan; # TODO Carp::Clan::Share
 
 with qw/Blog::Jive::Component/;
 
-use Scalar::Util qw/weaken/;
-
-has uri => qw/is ro lazy_build 1/;
-sub _build_uri {
-    my $self = shift;
-    return $self->jive->uri->child(qw//);
-}
-
-has schema_file => qw/is ro lazy_build 1/;
-sub _build_schema_file {
-    my $self = shift;
-    return $self->jive->file( 'run/content.sqlite' );
-}
-
-has deploy => qw/is ro lazy_build 1/;
-sub _build_deploy {
-    require DBIx::Deploy;
-    my $self = shift;
-    my $deploy;
-    $deploy = DBIx::Deploy->create(
-        engine => "SQLite",
-        database => [ $self->schema_file ],
-        create => \<<_END_,
-[% PRIMARY_KEY = "INTEGER PRIMARY KEY AUTOINCREMENT" %]
-[% KEY = "INTEGER" %]
-
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-insert_dtime DATE NOT NULL DEFAULT current_timestamp,
-
-[% CLEAR %]
---
-CREATE TABLE post (
-
-    id                  [% PRIMARY_KEY %],
-    uuid                TEXT NOT NULL,
-    creation        DATE NOT NULL,
-    modification            DATE,
-    header              TEXT NULL,
-
-    folder              TEXT,
-    title               TEXT,
-    abstract            TEXT,
-
-    UNIQUE (uuid)
-);
-_END_
-    );
-};
-has schema => qw/is ro lazy_build 1/;
-sub _build_schema {
-    require Blog::Jive::Journal::Schema;
-    my $self = shift;
-    my $schema = Blog::Jive::Journal::Schema->connect( $self->deploy->information );
-    $schema->journal($self);
-    weaken $schema->{journal};
-    return $schema;
-}
-
-has modeler => qw/is ro lazy_build 1/;
-sub _build_modeler {
-    require Blog::Jive::Journal::Model;
-    my $self = shift;
-    my $model = Blog::Jive::Journal::Modeler->new( journal => $self, schema => $self->schema, namespace => '+Blog::Jive::Journal::Model' );
-    return $model;
-};
-
-has cabinet => qw/is ro lazy_build 1/;
-sub _build_cabinet {
-    require Document::TriPart::Cabinet::Storage::Disk;
-    my $self = shift;
-    my $storage = Document::TriPart::Cabinet::Storage::Disk->new( dir => $self->journal_dir );
-    my $cabinet = Blog::Jive::Journal::Cabinet->new( jive => $self->jive, storage => $storage );
-    return $cabinet;
-}
-
-has journal_dir => qw/is ro lazy_build 1/;
-sub _build_journal_dir {
-    my $self = shift;
-    return $self->jive->dir( 'assets/content' );
-}
-
-has tt => qw/is ro lazy_build 1/;
-sub _build_tt {
-    require Template;
-    my $self = shift;
-    return Template->new({
-        INCLUDE_PATH => [ $self->journal_dir.'' ],
-    });
-}
-
 has overview => qw/is ro lazy_build 1/;
 sub _build_overview {
     require Blog::Jive::Journal::Overview;
@@ -107,22 +17,6 @@ sub _build_overview {
 
 sub uuid_path {
     return shift->cabinet->storage->uuid_path( @_ );
-}
-
-sub posts {
-    my $self = shift;
-    my @search = @_;
-    
-    @search = ( undef, { order_by => [qw/ creation DESC /] } ) unless @search;
-
-    return $self->modeler->model( 'Post' )->search( @search );
-}
-
-sub post {
-    my $self = shift;
-    my $uuid = shift;
-    my ($post) = $self->modeler->model( 'Post' )->search( { uuid => $uuid } )->slice( 0 );
-    return $post;
 }
 
 sub posts_for_home {
@@ -148,44 +42,5 @@ sub month {
     return $month;
 }
 
-package Blog::Jive::Journal::Cabinet;
-
-use Moose;
-
-extends qw/Document::TriPart::Cabinet/;
-
-with qw/Blog::Jive::Component/;
-
-has '+document_class' => (default => 'Blog::Jive::Journal::Cabinet::Document');
-
-#after save => sub {
-#    my $self = shift;
-#    my $document = shift;
-#    # TODO Move this to ::Journal or ::Journal::Cabinet ?
-#    $self->jive->journal->commit( $document );
-#};
-
-package Blog::Jive::Journal::Cabinet::Document;
-
-use Moose;
-
-extends qw/Document::TriPart::Cabinet::Document/;
-
-after save => sub {
-    my $self = shift;
-
-    my $creation = $self->creation;
-    my $modification = $self->modification;
-    my $uuid = $self->uuid;
-    my $header = $self->header;
-
-    $self->cabinet->jive->journal->modeler->model( 'Post' )->update_or_create( {
-        uuid => $self->uuid,
-        creation => $creation,
-        modification => $modification,
-        title => $header->{title},
-        folder => $header->{folder},
-    } );
-};
-
 1;
+

@@ -1,25 +1,37 @@
-package Blog::Jive::Journal::Model;
+package Blog::Jive::Model;
 
 use strict;
 use warnings;
 
-package Blog::Jive::Journal::Modeler;
+package Blog::Jive::Modeler;
 
 use Moose;
 
 extends qw/DBICx::Modeler/;
 
-has journal => qw/is ro required 1 isa Blog::Jive::Journal/;
+has jive => qw/is ro required 1 isa Blog::Jive/;
 
-package Blog::Jive::Journal::Model::Post;
+package Blog::Jive::Modeler::Model;
+
+use Moose::Role;
+
+has jive => qw/is ro lazy_build 1/;
+sub _build_jive {
+    return shift->_model__modeler->jive; # Doing this sort of access in the model is horribly ugly
+}
+
+package Blog::Jive::Model::Post;
+
+use DBICx::Modeler::Model;
+
+with qw/Blog::Jive::Modeler::Model/;
 
 use DateTimeX::Easy qw/datetime/;
-use DBICx::Modeler::Model;
 
 has uri => qw/is ro lazy_build 1/;
 sub _build_uri {
     my $self = shift;
-    return $self->_model__modeler->journal->uri->child( qw/ post /, join '-', lc $self->safe_title, $self->uuid );
+    return $self->jive->uri->child( qw/ post /, join '-', lc $self->safe_title, $self->uuid );
 }
 
 has safe_title => qw/is ro lazy_build 1 isa Str/;
@@ -35,13 +47,13 @@ sub _build_safe_title {
 has document => qw/is ro lazy_build 1/, handles => [qw/ edit /];
 sub _build_document {
     my $self = shift;
-    return $self->_model__modeler->journal->cabinet->load( $self->uuid );
+    return $self->jive->cabinet->load( $self->uuid );
 }
 
 has assets_dir => qw/is ro lazy_build 1/;
 sub _build_assets_dir {
     my $self = shift;
-    return $self->_model__modeler->journal->cabinet->storage->assets_dir( $self->uuid );
+    return $self->jive->cabinet->storage->assets_dir( $self->uuid );
 }
 
 has creation => qw/is ro lazy_build 1/;
@@ -59,10 +71,10 @@ sub _build_local_creation {
 has body => qw/is ro lazy_build 1/;
 sub _build_body {
     my $self = shift;
-    return Blog::Jive::Journal::Model::Post::Body->new( post => $self );
+    return Blog::Jive::Model::Post::Body->new( post => $self );
 }
 
-package Blog::Jive::Journal::Model::Post::Body;
+package Blog::Jive::Model::Post::Body;
 
 use Moose;
 
@@ -85,16 +97,17 @@ has render => qw/is ro lazy_build 1/;
 sub _build_render {
     my $self = shift;
 
-    my $journal = $self->post->_model__modeler->journal;
     my $header = $self->post->document->header;
-    my $type = $header->{type} || ''; # TODO Make this configurable
+    my $type = $header->{type} || $header->{content_type} || ''; # TODO Make this configurable
+    $type = 'tt-markdown' if $type =~ m/text\/.*markdown/;
 
     my $render = $self->raw;
     if ($type =~ m/\btt\b/) {
+        my $tt = $self->post->jive->tt;
         my $ASSETS = join '/', $self->post->assets_dir->dir_list(-3);
         my $input = \$render;
         my $output;
-        $journal->tt->process( $input, { post => $self, ASSETS => $ASSETS }, \$output ) or die $journal->tt->error;
+        $tt->process( $input, { post => $self, ASSETS => $ASSETS }, \$output ) or die $tt->error;
         $render = $output;
     }
 

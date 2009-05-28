@@ -24,7 +24,7 @@ use lib qw/_lib/;
 use Moose;
 use Blog::Jive::Carp;
 
-use Path::Class;
+use Path::Class();
 
 has home => qw/reader _home lazy_build 1/;
 sub _build_home {
@@ -33,7 +33,7 @@ sub _build_home {
     $self->guessed_home( 1 );
     # TODO Check for .bluejay (or whatever)
     # TODO Use Find::HomeDir (or whatever)
-    return dir( $ENV{HOME}, '.blog-jive' );
+    return Path::Class::dir( $ENV{HOME}, '.blog-jive' );
 }
 has guessed_home => qw/is rw isa Bool default 0/; # TODO Invalid if called before ->home
 sub home_exists {
@@ -66,11 +66,86 @@ sub BUILD {
     $self->set_uri( $given->{uri} ) if $given->{uri};
 }
 
-has journal => qw/is ro lazy_build 1/;
-sub _build_journal {
-    require Blog::Jive::Journal;
+#has journal => qw/is ro lazy_build 1/;
+#sub _build_journal {
+#    require Blog::Jive::Journal;
+#    my $self = shift;
+#    return Blog::Jive::Journal->new( jive => $self );
+#}
+
+has cabinet => qw/is ro lazy_build 1/;
+sub _build_cabinet {
+    require Blog::Jive::Cabinet;
+    require Document::TriPart::Cabinet::Storage::Disk;
     my $self = shift;
-    return Blog::Jive::Journal->new( jive => $self );
+    my $storage = Document::TriPart::Cabinet::Storage::Disk->new( dir => $self->dir( 'assets/document' ) );
+    my $cabinet = Blog::Jive::Cabinet->new( jive => $self, storage => $storage );
+    return $cabinet;
+}
+
+use Scalar::Util qw/weaken/;
+
+has schema_file => qw/is ro lazy_build 1/;
+sub _build_schema_file {
+    my $self = shift;
+    return $self->file( 'run/bluejay.sqlite' );
+}
+
+has deploy => qw/is ro lazy_build 1/;
+sub _build_deploy {
+    require DBIx::Deploy;
+    my $self = shift;
+    my $deploy;
+    $deploy = DBIx::Deploy->create(
+        engine => "SQLite",
+        database => [ $self->schema_file ],
+        create => \<<_END_,
+[% PRIMARY_KEY = "INTEGER PRIMARY KEY AUTOINCREMENT" %]
+[% KEY = "INTEGER" %]
+
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+insert_dtime DATE NOT NULL DEFAULT current_timestamp,
+
+[% CLEAR %]
+--
+CREATE TABLE post (
+
+    id                  [% PRIMARY_KEY %],
+    uuid                TEXT NOT NULL,
+    creation        DATE NOT NULL,
+    modification            DATE,
+    header              TEXT NULL,
+
+    folder              TEXT,
+    title               TEXT,
+    abstract            TEXT,
+
+    UNIQUE (uuid)
+);
+_END_
+    );
+};
+has schema => qw/is ro lazy_build 1/;
+sub _build_schema {
+    require Blog::Jive::Schema;
+    my $self = shift;
+    my $schema = Blog::Jive::Schema->connect( $self->deploy->information );
+    $schema->jive($self);
+    weaken $schema->{jive};
+    return $schema;
+}
+
+has modeler => qw/is ro lazy_build 1/;
+sub _build_modeler {
+    require Blog::Jive::Model;
+    my $self = shift;
+    my $model = Blog::Jive::Modeler->new( jive => $self, schema => $self->schema, namespace => '+Blog::Jive::Model' );
+    return $model;
+};
+
+sub model {
+    my $self = shift;
+    return $self->modeler->model( @_ );
 }
 
 has assets => qw/is ro lazy_build 1/;
@@ -79,6 +154,22 @@ sub _build_assets {
     my $self = shift;
     # TODO Implement overwrite option
     return Blog::Jive::Assets->new( base => $self->home );
+}
+
+has tt => qw/is ro lazy_build 1/;
+sub _build_tt {
+    require Template;
+    my $self = shift;
+    return Template->new({
+        INCLUDE_PATH => [ $self->dir( 'assets/document' ) ],
+    });
+}
+
+has journal => qw/is ro lazy_build 1/, handles => [qw/ post posts create_post /];
+sub _build_journal {
+    require Blog::Jive::Model::Journal;
+    my $self = shift;
+    return Blog::Jive::Model::Journal->new( jive => $self );
 }
 
 #has kit => qw/is ro lazy_build 1/, handles => [qw/ home home_dir /];

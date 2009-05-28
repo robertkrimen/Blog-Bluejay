@@ -1,4 +1,4 @@
-package Blog::Jive::Journal::Schema;
+package Blog::Jive::Schema;
 
 use strict;
 use warnings;
@@ -6,10 +6,10 @@ use warnings;
 use base qw/DBIx::Class::Schema Class::Accessor::Fast/;
 our $schema = __PACKAGE__;
 
-__PACKAGE__->mk_accessors(qw/journal/);
+__PACKAGE__->mk_accessors(qw/jive/);
 __PACKAGE__->load_namespaces;
 
-package Blog::Jive::Journal::Schema::Result::Post;
+package Blog::Jive::Schema::Result::Post;
 
 use strict;
 use warnings;

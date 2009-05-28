@@ -41,14 +41,6 @@ my @jive;
     sub jive {
         return $jive ||= Blog::Jive->new( @jive, @_ );
     }
-
-    sub journal {
-        return jive->journal;
-    }
-
-    sub cabinet {
-        return journal->cabinet;
-    }
 }
 
 sub abort(@) {
@@ -76,7 +68,8 @@ sub folder_title {
 }
 
 
-sub find {
+sub find ($@) {
+    my $ctx = shift;
     my @criteria = @_;
 
     return unless @criteria;
@@ -85,7 +78,7 @@ sub find {
     my ($folder, $title) = folder_title @criteria;
 
     my ($search, $post, $count);
-    $search = journal->posts(
+    $search = $ctx->jive->posts(
         [ 
             { title => $criteria },
             { folder => $folder, title => $title },
@@ -108,7 +101,7 @@ sub do_list ($;$) {
     my $ctx = shift;
     my $search = shift;
 
-    $search = scalar journal->posts unless $search;
+    $search = scalar $ctx->jive->posts unless $search;
     my @posts = $search->search( undef, { order_by => [qw/ creation /] } )->all;
 
     my $tb = Text::ASCIITable->new({ hide_HeadLine => 1 });
@@ -122,9 +115,10 @@ sub do_usage ($) {
     Blog::Jive::App::help::do_usage $ctx;
 }
 
-sub do_new {
-    my ($folder, $title) = @_;
-    my $document = cabinet->create;
+sub do_new ($$$) {
+    my ($ctx, $folder, $title) = @_;
+
+    my $document = $ctx->jive->cabinet->create;
     $document->header->{title} = $title;
     $document->header->{folder} = $folder;
     $document->edit;
@@ -140,7 +134,7 @@ sub do_find ($@) {
         return;
     }
 
-    my ($post, $search, $count) = find @criteria;
+    my ($post, $search, $count) = find $ctx, @criteria;
 
     abort "No post found matching your criteria" unless $count;
 
@@ -246,9 +240,10 @@ on 'publish' => undef, sub {
 
 on 'edit *' => undef, sub {
     my $ctx = shift;
+
     return do_list $ctx unless @_;
 
-    my ($post, $search, $count) = find @_;
+    my ($post, $search, $count) = find $ctx, @_;
 
     if ($post) {
         $post->edit;
@@ -264,20 +259,21 @@ on 'edit *' => undef, sub {
 
 on 'load' => undef, sub {
     my $ctx = shift;
-    my $dir = journal->journal_dir;
-    $dir->recurse(callback => sub {
+
+    $ctx->jive->dir( 'assets/document' )->recurse(callback => sub {
         my $file = shift;
         return unless -d $file;
         return unless $file->dir_list(-1) =~ m/^($Document::TriPart::Cabinet::UUID::re)$/;
         my $uuid = $1;
         warn "$uuid => $file\n";
-        my $document = journal->cabinet->load( $uuid );
+        my $document = $ctx->jive->cabinet->load( $uuid );
         $document->save;
     });
 };
 
 on 'status' => undef, sub {
     my $ctx = shift;
+
     my ($problem);
     $ctx->print( "home = ", jive->home);
     $ctx->print( " (guessed)") if $ctx->jive->guessed_home;
@@ -299,7 +295,7 @@ on qr/.*/ => undef, sub {
     my $command = $ctx->command;
 
     if ($command) {
-        $ctx->print( "\nblog-jive: Unknown command \"$command\"\n" );
+        $ctx->print( "blog-jive: Unknown command \"$command\"\n\n" );
     }
 
     do_usage $ctx;
