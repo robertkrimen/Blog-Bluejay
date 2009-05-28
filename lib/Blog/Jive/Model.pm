@@ -31,7 +31,7 @@ use DateTimeX::Easy qw/datetime/;
 has uri => qw/is ro lazy_build 1/;
 sub _build_uri {
     my $self = shift;
-    return $self->jive->uri->child( qw/ post /, join '-', lc $self->safe_title, $self->uuid );
+    return $self->jive->uri->child( qw/ journal /, join '-', lc $self->safe_title, $self->uuid );
 }
 
 has safe_title => qw/is ro lazy_build 1 isa Str/;

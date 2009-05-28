@@ -44,12 +44,22 @@ sub _new_page {
     my $page_blueprint = shift || {};
     my $rank = shift;
 
-    my $class = 'Blog::Jive::Layout::TemplatePage';
-    $class = 'Blog::Jive::Layout::JournalPage' if $name eq 'journal';
+    my ( $class, $label, $path );
 
-    my $label = $page_blueprint->{label};
-    $label = $name unless defined $label && length $label;
-    my $path = $name;
+    $class = 'Blog::Jive::Layout::TemplatePage';
+    $label = $page_blueprint->{label};
+    undef $label if defined $label && ! length $label;
+
+    if ( $name eq 'journal' ) {
+        $class = 'Blog::Jive::Layout::JournalPage';
+        $path = '' unless $self->home;
+    }
+    elsif ( $name eq 'home' ) {
+        $path = '';
+    }
+
+    $path = $name unless defined $path;
+    $label = $name unless defined $label;
 
     my $page = $class->new( layout => $self, label => $label, path => Path::Abstract->new( $path ), rank => $rank );
     $self->page_map->{$name} = $page;
