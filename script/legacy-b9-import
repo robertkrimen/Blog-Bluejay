@@ -9,7 +9,7 @@ use Document::TriPart::Cabinet;
 
 my $bluejay = Blog::Bluejay->new;
 my $journal = $bluejay->journal;
-my $cabinet = $journal->cabinet;
+my $cabinet = $bluejay->cabinet;
 
 my $dir = dir 'legacy-cabinet';
 for (grep { -f $_ } $dir->children) {

@@ -197,16 +197,9 @@ start [qw/ home=s /], sub {
 on 'setup *' => undef, sub {
     my $ctx = shift;
 
-    unless ( @_ ) {
-        $ctx->print( <<_END_ );
-Don't overwrite your work, fool!
-_END_
-        return
-    }
-
     my ($home, $yes);
 
-    if (@_) {
+    if ( @_ ) {
         $home = Path::Class::dir( shift );
         $ctx->bluejay->home( $home );
     }
@@ -214,6 +207,13 @@ _END_
         $home = $ctx->bluejay->home;
     }
     $home = $home->absolute;
+
+    if ( -e $ctx->bluejay->file( 'assets/.protect' ) ) {
+        $ctx->print( <<_END_ );
+Don't overwrite your work, fool!
+_END_
+        return
+    }
 
     if (-d $home) {
         $ctx->print( <<_END_ );
