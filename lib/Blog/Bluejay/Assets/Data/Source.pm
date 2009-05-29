@@ -40,28 +40,34 @@ assets/tt/frame.tt.html
 </html>
 __ASSET__
 assets/tt/post.tt.html
+[% DEFAULT post_meta = 0 %]
+[% CLEAR -%]
 <div>
     <div class="post">
 
         <div class="post-header">
 
-            <div class="datetime">
+            <div class="post-meta post-meta-1">
 
-                <div class="datetime-weekday">[% post.local_creation.strftime("%A") %]</div>
+                <div class="datetime">
 
-                <div class="clear"></div>
+                    <div class="datetime-weekday">[% post.local_creation.strftime("%A") %]</div>
 
-                <div class="datetime-month-day-year">
-                    <div class="datetime-month">
-                        [% post.local_creation.strftime("%B %d %Y") %]
+                    <div class="clear"></div>
+
+                    <div class="datetime-month-day-year">
+                        <div class="datetime-month">
+                            [% post.local_creation.strftime("%B %d %Y") %]
+                        </div>
                     </div>
+
+                    <div class="clear"></div>
+
+                    <div class="datetime-time">[% post.local_creation.strftime("%H:%M %P") %]</div>
+
+                    <div class="clear"></div>
+
                 </div>
-
-                <div class="clear"></div>
-
-                <div class="datetime-time">[% post.local_creation.strftime("%H:%M %P") %]</div>
-
-                <div class="clear"></div>
 
             </div>
 
@@ -97,7 +103,7 @@ assets/tt/header.tt.html
 __ASSET__
 assets/tt/posts.tt.html
 [% FOREACH post = posts %]
-[% INCLUDE post.tt.html %]
+[% INCLUDE post.tt.html post_meta = loop.count % 4 %]
 [% IF ! loop.last %]
 <div class="post-separator"></div>
 [% END %]
@@ -133,20 +139,38 @@ a:hover {
     text-decoration: underline;
 }
 
-.datetime {
+.post-meta {
     float: right;
-    color: #666;
-    font-size: 14px;
+/*    color: #666;*/
+    font-size: 0.85em;
     line-height: 1.2;
-    margin: 15px -10px 20px 20px;
-    margin: 0px -10px 20px 20px;
     margin: 0px 0px 10px 20px;
-/*    background: #eee;*/
-/*    background: #eee;*/
-/*    border: 2px solid #eef;*/
-/*    border-bottom: 2px solid #eee;*/
+    width: 13em;
     padding: 5px;
 }
+
+.post-meta-1, .post-meta-1 a {
+    background: #def none repeat scroll 0 0;
+    color: #345;
+}
+
+.datetime {
+}
+
+/*.datetime {*/
+/*    float: right;*/
+/*    color: #666;*/
+/*    font-size: 14px;*/
+/*    line-height: 1.2;*/
+/*    margin: 15px -10px 20px 20px;*/
+/*    margin: 0px -10px 20px 20px;*/
+/*    margin: 0px 0px 10px 20px;*/
+/*|+    background: #eee;+|*/
+/*|+    background: #eee;+|*/
+/*|+    border: 2px solid #eef;+|*/
+/*|+    border-bottom: 2px solid #eee;+|*/
+/*    padding: 5px;*/
+/*}*/
 
 .datetime-time {
     float: left;
@@ -156,7 +180,7 @@ a:hover {
 
 .datetime-weekday {
     float: left;
-    color: #666;
+/*    color: #666;*/
     font-size: 16px;
 /*    margin-bottom: 0.1em;*/
     font-variant: small-caps;

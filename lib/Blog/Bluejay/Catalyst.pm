@@ -25,7 +25,7 @@ __PACKAGE__->config(
         INCLUDE_PATH => [
             ( -e 'assets_embed' ? Path::Class::File->new( qw/assets_embed tt/ )->absolute : () ),
             __PACKAGE__->path_to( qw/assets tt/ ),
-            __PACKAGE__->path_to( qw/assets content/ )
+            __PACKAGE__->path_to( qw/assets document/ )
         ],
         CATALYST_VAR => 'Catalyst',
     },

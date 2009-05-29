@@ -1,25 +1,31 @@
+[% DEFAULT post_meta = 0 %]
+[% CLEAR -%]
 <div>
     <div class="post">
 
         <div class="post-header">
 
-            <div class="datetime">
+            <div class="post-meta post-meta-1">
 
-                <div class="datetime-weekday">[% post.local_creation.strftime("%A") %]</div>
+                <div class="datetime">
 
-                <div class="clear"></div>
+                    <div class="datetime-weekday">[% post.local_creation.strftime("%A") %]</div>
 
-                <div class="datetime-month-day-year">
-                    <div class="datetime-month">
-                        [% post.local_creation.strftime("%B %d %Y") %]
+                    <div class="clear"></div>
+
+                    <div class="datetime-month-day-year">
+                        <div class="datetime-month">
+                            [% post.local_creation.strftime("%B %d %Y") %]
+                        </div>
                     </div>
+
+                    <div class="clear"></div>
+
+                    <div class="datetime-time">[% post.local_creation.strftime("%H:%M %P") %]</div>
+
+                    <div class="clear"></div>
+
                 </div>
-
-                <div class="clear"></div>
-
-                <div class="datetime-time">[% post.local_creation.strftime("%H:%M %P") %]</div>
-
-                <div class="clear"></div>
 
             </div>
 

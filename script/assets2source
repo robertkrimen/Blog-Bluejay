@@ -17,6 +17,8 @@ find( { no_chdir => 1, wanted => sub {
     return ($File::Find::prune = 1) if
         $path =~ m!^assets/document! ||
         $path =~ m!\btt/mock! ||
+        $path =~ m/\.sw.$/ ||
+        $path =~ m{^assets/.protect$} ||
         0
     ;
     return unless -f $path;

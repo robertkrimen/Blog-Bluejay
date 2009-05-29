@@ -14,20 +14,38 @@ a:hover {
     text-decoration: underline;
 }
 
-.datetime {
+.post-meta {
     float: right;
-    color: #666;
-    font-size: 14px;
+/*    color: #666;*/
+    font-size: 0.85em;
     line-height: 1.2;
-    margin: 15px -10px 20px 20px;
-    margin: 0px -10px 20px 20px;
     margin: 0px 0px 10px 20px;
-/*    background: #eee;*/
-/*    background: #eee;*/
-/*    border: 2px solid #eef;*/
-/*    border-bottom: 2px solid #eee;*/
+    width: 13em;
     padding: 5px;
 }
+
+.post-meta-1, .post-meta-1 a {
+    background: #def none repeat scroll 0 0;
+    color: #345;
+}
+
+.datetime {
+}
+
+/*.datetime {*/
+/*    float: right;*/
+/*    color: #666;*/
+/*    font-size: 14px;*/
+/*    line-height: 1.2;*/
+/*    margin: 15px -10px 20px 20px;*/
+/*    margin: 0px -10px 20px 20px;*/
+/*    margin: 0px 0px 10px 20px;*/
+/*|+    background: #eee;+|*/
+/*|+    background: #eee;+|*/
+/*|+    border: 2px solid #eef;+|*/
+/*|+    border-bottom: 2px solid #eee;+|*/
+/*    padding: 5px;*/
+/*}*/
 
 .datetime-time {
     float: left;
@@ -37,7 +55,7 @@ a:hover {
 
 .datetime-weekday {
     float: left;
-    color: #666;
+/*    color: #666;*/
     font-size: 16px;
 /*    margin-bottom: 0.1em;*/
     font-variant: small-caps;

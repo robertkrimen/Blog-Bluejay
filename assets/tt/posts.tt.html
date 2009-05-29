@@ -1,5 +1,5 @@
 [% FOREACH post = posts %]
-[% INCLUDE post.tt.html %]
+[% INCLUDE post.tt.html post_meta = loop.count % 4 %]
 [% IF ! loop.last %]
 <div class="post-separator"></div>
 [% END %]

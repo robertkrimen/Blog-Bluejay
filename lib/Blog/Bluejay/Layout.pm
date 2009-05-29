@@ -64,7 +64,7 @@ sub _new_page {
     $path = $name unless defined $path;
     $label = $name unless defined $label;
 
-    my $page = $class->new( layout => $self, label => $label, path => Path::Abstract->new( $path ), rank => $rank );
+    my $page = $class->new( name => $name, layout => $self, label => $label, path => Path::Abstract->new( $path ), rank => $rank );
     $self->page_map->{$name} = $page;
     return $page;
 }
@@ -78,6 +78,7 @@ has bluejay => qw/is ro lazy_build 1/;
 sub _build_bluejay {
     return shift->layout->bluejay;
 }
+has name => qw/is rw isa Str required 1/; # Kind of like a path
 has label => qw/is rw isa Str required 1/;
 has rank => qw/is rw isa Int required 1/;
 
@@ -103,12 +104,14 @@ use Moose;
 
 extends qw/Blog::Bluejay::Layout::Page/;
 
-has template => qw/is rw Str lazy_build 1/;
+has template => qw/is rw isa Str lazy_build 1/;
 sub _build_template {
     my $self = shift;
-    my $template = $self->path->clone;
-    $template->extension( '.tt.html' ); # TODO Configurable?
-    return $template;
+    return join '', $self->name, '.tt.html';
+    my $template = $self->name; # TODO Urgh!
+    
+#    $template->extension( '.tt.html' ); # TODO Configurable?
+    return $template.'';
 }
 
 sub render {
