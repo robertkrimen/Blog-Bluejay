@@ -268,6 +268,20 @@ _END_
 
     } }, $home );
     $ctx->print( "\n" );
+
+    $ctx->print( <<_END_ );
+
+To control your blog, you can either setup the following script:
+
+    #!/bin/sh
+    # $0 --home "$home" \$*
+    # Take out the leading comment on the previous line
+
+... or use the following alias:
+
+    # alias "my-blog"="$0 --home \\"$home\\""
+
+_END_
 };
 
 on 'publish' => undef, sub {
@@ -287,7 +301,7 @@ on 'edit *' => undef, sub {
     else {
         return do_choose $ctx, $search if $count > 1;
         return unless my ($folder, $title) = folder_title @_;
-        if (prompt_yn "Post \"$title\" not found. Do you want to start it? y/N", 'N') {
+        if (prompt_yn "Post \"$title\" not found. Do you want to start it? y/N", 'Y') {
             my $post = do_new $ctx, $folder, $title;
         }
     }

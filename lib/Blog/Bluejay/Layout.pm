@@ -36,7 +36,7 @@ sub parse {
     $rank = 0;
 
     for (qw/ home journal about contact /) {
-        $self->_new_page( $blueprint, $_ => $page, $rank++ ) if $page = $blueprint->{$_} || $_ eq 'journal';
+        $self->_new_page( $blueprint, $_ => $page, $rank++ ) if (($page = $blueprint->{$_}) || ($_ eq 'journal'));
     }
 }
 

@@ -1,4 +1,4 @@
-.PHONY: all test clean distclean dist pack
+.PHONY: all test clean distclean dist pack assets
 
 all: test
 
@@ -24,3 +24,6 @@ reset: clean
 
 pack:
 	tpage --include_path assets_embed --include_path assets/tt Embed.pm > lib/Blog/Bluejay/Assets/Embed.pm
+
+assets:
+	./script/assets2source > lib/Blog/Bluejay/Assets/Data/Source.pm
