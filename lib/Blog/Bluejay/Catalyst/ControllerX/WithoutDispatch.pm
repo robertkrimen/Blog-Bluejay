@@ -1,28 +1,16 @@
-package Blog::Bluejay::Catalyst::Controller::Root;
+package Blog::Bluejay::Catalyst::ControllerX::WithoutDispatch;
 
 use strict;
 use warnings;
 
-use parent qw/Blog::Bluejay::Catalyst::ControllerX::WithDispatch/;
-
-__PACKAGE__->config->{namespace} = '';
-
-1;
-
-__END__
-
 use parent qw/Catalyst::Controller/;
-
-__PACKAGE__->config->{namespace} = '';
 
 use Moose;
 use YUI::Loader;
 use jQuery::Loader;
 use File::Assets;
-use Blog::Bluejay;
-use Text::Lorem::More;
 
-sub auto :Private {
+sub prepare {
     my ( $self, $ctx ) = @_;
 
     my $stash = $ctx->stash;
@@ -39,39 +27,43 @@ sub auto :Private {
     return 1;
 }
 
-sub index :Private {
+sub action_index {
     my ( $self, $ctx ) = @_;
 
     if ( my $home = $ctx->layout->home ) {
-        $home->render( $ctx );
+        $self->action_home( $ctx );
     }
     else {
-        $ctx->forward( 'journal' );
+        $self->action_journal( $ctx );
     }
 }
 
-sub journal :Local {
+sub action_home {
+    my ( $self, $ctx ) = @_;
+
+    $ctx->layout->home->render( $ctx );
+}
+
+sub action_journal {
     my ( $self, $ctx ) = @_;
 
     $ctx->layout->journal->render( $ctx );
 }
 
-sub about :Local {
+sub action_about {
     my ( $self, $ctx ) = @_;
 
     $ctx->layout->about->render( $ctx );
 }
 
-sub contact :Local {
+sub action_contact {
     my ( $self, $ctx ) = @_;
 
     $ctx->layout->contact->render( $ctx );
 }
 
-sub journal_post :Regex('^journal/.*-([A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{12})') {
-    my ( $self, $ctx ) = @_;
-
-    my ($uuid) = @{ $ctx->request->captures };
+sub action_journal_post {
+    my ( $self, $ctx, $uuid ) = @_;
 
     my $post = $ctx->journal->post( $uuid );
     $ctx->stash(
@@ -80,7 +72,7 @@ sub journal_post :Regex('^journal/.*-([A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-
     );
 }
 
-sub feed_atom :Path('feed/atom') {
+sub action_feed_atom {
     my ( $self, $ctx ) = @_;
 
     use XML::Atom::SimpleFeed;
@@ -112,26 +104,10 @@ sub feed_atom :Path('feed/atom') {
     $ctx->response->body( $feed->as_string );
 }
 
-sub not_found :Private {
+sub action_not_found {
     my ( $self, $ctx ) = @_;
     $ctx->response->body( 'Page not found' );
-    $ctx->response->status(404);
+    $ctx->response->status( 404 );
 }
 
-sub end : ActionClass('RenderView') {}
-
 1;
-
-#sub journal_month :Regex('^journal/(\d{4})/(\d{1,2})') {
-#    my ( $self, $ctx ) = @_;
-
-#    my $journal = $ctx->stash->{journal};
-#    my ($year, $month) = @{ $ctx->request->captures };
-
-#    $month = $journal->month( "$year-$month" );
-#    $ctx->stash(
-#        template => 'journal/month.tt.html',
-#        posts => [ $month->posts ],
-#    );
-#}
-
