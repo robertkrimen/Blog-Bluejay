@@ -39,11 +39,11 @@ Blog::Bluejay::Catalyst->run(
 
 =head1 NAME
 
-project_jive_catalyst_fastcgi.pl - Catalyst FastCGI
+blog_bluejay_catalyst_fastcgi.pl - Catalyst FastCGI
 
 =head1 SYNOPSIS
 
-project_jive_catalyst_fastcgi.pl [options]
+blog_bluejay_catalyst_fastcgi.pl [options]
 
  Options:
    -? -help      display this help and exits

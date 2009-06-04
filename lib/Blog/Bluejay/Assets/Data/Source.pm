@@ -1,6 +1,388 @@
 package Blog::Bluejay::Assets::Data::Source;
 1;
 __DATA__
+script/blog_bluejay_catalyst_server.pl
+#!/usr/bin/env perl
+
+BEGIN {
+    $ENV{CATALYST_ENGINE} ||= 'HTTP';
+    $ENV{CATALYST_SCRIPT_GEN} = 33;
+    require Catalyst::Engine::HTTP;
+}
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+my $debug             = 0;
+my $fork              = 0;
+my $help              = 0;
+my $host              = undef;
+my $port              = $ENV{BLOG_BLUEJAY_CATALYST_PORT} || $ENV{CATALYST_PORT} || 3000;
+my $keepalive         = 0;
+my $restart           = $ENV{BLOG_BLUEJAY_CATALYST_RELOAD} || $ENV{CATALYST_RELOAD} || 0;
+my $restart_delay     = 1;
+my $restart_regex     = '(?:/|^)(?!\.#).+(?:\.yml$|\.yaml$|\.conf|\.pm)$';
+my $restart_directory = undef;
+my $follow_symlinks   = 0;
+my $background        = 0;
+
+my @argv = @ARGV;
+
+GetOptions(
+    'debug|d'             => \$debug,
+    'fork|f'              => \$fork,
+    'help|?'              => \$help,
+    'host=s'              => \$host,
+    'port=s'              => \$port,
+    'keepalive|k'         => \$keepalive,
+    'restart|r'           => \$restart,
+    'restartdelay|rd=s'   => \$restart_delay,
+    'restartregex|rr=s'   => \$restart_regex,
+    'restartdirectory=s@' => \$restart_directory,
+    'followsymlinks'      => \$follow_symlinks,
+    'background'          => \$background,
+);
+
+pod2usage(1) if $help;
+
+if ( $restart && $ENV{CATALYST_ENGINE} eq 'HTTP' ) {
+    $ENV{CATALYST_ENGINE} = 'HTTP::Restarter';
+}
+if ( $debug ) {
+    $ENV{CATALYST_DEBUG} = 1;
+}
+
+# This is require instead of use so that the above environment
+# variables can be set at runtime.
+require Blog::Bluejay::Catalyst;
+
+Blog::Bluejay::Catalyst->run( $port, $host, {
+    argv              => \@argv,
+    'fork'            => $fork,
+    keepalive         => $keepalive,
+    restart           => $restart,
+    restart_delay     => $restart_delay,
+    restart_regex     => qr/$restart_regex/,
+    restart_directory => $restart_directory,
+    follow_symlinks   => $follow_symlinks,
+    background        => $background,
+} );
+
+1;
+
+=head1 NAME
+
+blog_bluejay_catalyst_server.pl - Catalyst Testserver
+
+=head1 SYNOPSIS
+
+blog_bluejay_catalyst_server.pl [options]
+
+ Options:
+   -d -debug          force debug mode
+   -f -fork           handle each request in a new process
+                      (defaults to false)
+   -? -help           display this help and exits
+      -host           host (defaults to all)
+   -p -port           port (defaults to 3000)
+   -k -keepalive      enable keep-alive connections
+   -r -restart        restart when files get modified
+                      (defaults to false)
+   -rd -restartdelay  delay between file checks
+   -rr -restartregex  regex match files that trigger
+                      a restart when modified
+                      (defaults to '\.yml$|\.yaml$|\.conf|\.pm$')
+   -restartdirectory  the directory to search for
+                      modified files, can be set mulitple times
+                      (defaults to '[SCRIPT_DIR]/..')
+   -follow_symlinks   follow symlinks in search directories
+                      (defaults to false. this is a no-op on Win32)
+   -background        run the process in the background
+ See also:
+   perldoc Catalyst::Manual
+   perldoc Catalyst::Manual::Intro
+
+=head1 DESCRIPTION
+
+Run a Catalyst Testserver for this application.
+
+=head1 AUTHORS
+
+Catalyst Contributors, see Catalyst.pm
+
+=head1 COPYRIGHT
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+__ASSET__
+script/blog_bluejay_catalyst_cgi.pl
+#!/usr/bin/env perl
+
+BEGIN { $ENV{CATALYST_ENGINE} ||= 'CGI' }
+
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Blog::Bluejay::Catalyst;
+
+Blog::Bluejay::Catalyst->run;
+
+1;
+
+=head1 NAME
+
+blog_bluejay_catalyst_cgi.pl - Catalyst CGI
+
+=head1 SYNOPSIS
+
+See L<Catalyst::Manual>
+
+=head1 DESCRIPTION
+
+Run a Catalyst application as a cgi script.
+
+=head1 AUTHORS
+
+Catalyst Contributors, see Catalyst.pm
+
+=head1 COPYRIGHT
+
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+__ASSET__
+script/blog_bluejay_catalyst_fastcgi.pl
+#!/usr/bin/env perl
+
+BEGIN { $ENV{CATALYST_ENGINE} ||= 'FastCGI' }
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Blog::Bluejay::Catalyst;
+
+my $help = 0;
+my ( $listen, $nproc, $pidfile, $manager, $detach, $keep_stderr );
+
+GetOptions(
+    'help|?'      => \$help,
+    'listen|l=s'  => \$listen,
+    'nproc|n=i'   => \$nproc,
+    'pidfile|p=s' => \$pidfile,
+    'manager|M=s' => \$manager,
+    'daemon|d'    => \$detach,
+    'keeperr|e'   => \$keep_stderr,
+);
+
+pod2usage(1) if $help;
+
+Blog::Bluejay::Catalyst->run(
+    $listen,
+    {   nproc   => $nproc,
+        pidfile => $pidfile,
+        manager => $manager,
+        detach  => $detach,
+	keep_stderr => $keep_stderr,
+    }
+);
+
+1;
+
+=head1 NAME
+
+blog_bluejay_catalyst_fastcgi.pl - Catalyst FastCGI
+
+=head1 SYNOPSIS
+
+blog_bluejay_catalyst_fastcgi.pl [options]
+
+ Options:
+   -? -help      display this help and exits
+   -l -listen    Socket path to listen on
+                 (defaults to standard input)
+                 can be HOST:PORT, :PORT or a
+                 filesystem path
+   -n -nproc     specify number of processes to keep
+                 to serve requests (defaults to 1,
+                 requires -listen)
+   -p -pidfile   specify filename for pid file
+                 (requires -listen)
+   -d -daemon    daemonize (requires -listen)
+   -M -manager   specify alternate process manager
+                 (FCGI::ProcManager sub-class)
+                 or empty string to disable
+   -e -keeperr   send error messages to STDOUT, not
+                 to the webserver
+
+=head1 DESCRIPTION
+
+Run a Catalyst application as fastcgi.
+
+=head1 AUTHORS
+
+Catalyst Contributors, see Catalyst.pm
+
+=head1 COPYRIGHT
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+__ASSET__
+script/blog_bluejay_catalyst_test.pl
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Catalyst::Test 'Blog::Bluejay::Catalyst';
+
+my $help = 0;
+
+GetOptions( 'help|?' => \$help );
+
+pod2usage(1) if ( $help || !$ARGV[0] );
+
+print request($ARGV[0])->content . "\n";
+
+1;
+
+=head1 NAME
+
+blog_bluejay_catalyst_test.pl - Catalyst Test
+
+=head1 SYNOPSIS
+
+blog_bluejay_catalyst_test.pl [options] uri
+
+ Options:
+   -help    display this help and exits
+
+ Examples:
+   blog_bluejay_catalyst_test.pl http://localhost/some_action
+   blog_bluejay_catalyst_test.pl /some_action
+
+ See also:
+   perldoc Catalyst::Manual
+   perldoc Catalyst::Manual::Intro
+
+=head1 DESCRIPTION
+
+Run a Catalyst action from the command line.
+
+=head1 AUTHORS
+
+Catalyst Contributors, see Catalyst.pm
+
+=head1 COPYRIGHT
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+__ASSET__
+script/blog_bluejay_catalyst_create.pl
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+eval "use Catalyst::Helper;";
+
+if ($@) {
+  die <<END;
+To use the Catalyst development tools including catalyst.pl and the
+generated script/myapp_create.pl you need Catalyst::Helper, which is
+part of the Catalyst-Devel distribution. Please install this via a
+vendor package or by running one of -
+
+  perl -MCPAN -e 'install Catalyst::Devel'
+  perl -MCPANPLUS -e 'install Catalyst::Devel'
+END
+}
+
+my $force = 0;
+my $mech  = 0;
+my $help  = 0;
+
+GetOptions(
+    'nonew|force'    => \$force,
+    'mech|mechanize' => \$mech,
+    'help|?'         => \$help
+ );
+
+pod2usage(1) if ( $help || !$ARGV[0] );
+
+my $helper = Catalyst::Helper->new( { '.newfiles' => !$force, mech => $mech } );
+
+pod2usage(1) unless $helper->mk_component( 'Blog::Bluejay::Catalyst', @ARGV );
+
+1;
+
+=head1 NAME
+
+blog_bluejay_catalyst_create.pl - Create a new Catalyst Component
+
+=head1 SYNOPSIS
+
+blog_bluejay_catalyst_create.pl [options] model|view|controller name [helper] [options]
+
+ Options:
+   -force        don't create a .new file where a file to be created exists
+   -mechanize    use Test::WWW::Mechanize::Catalyst for tests if available
+   -help         display this help and exits
+
+ Examples:
+   blog_bluejay_catalyst_create.pl controller My::Controller
+   blog_bluejay_catalyst_create.pl -mechanize controller My::Controller
+   blog_bluejay_catalyst_create.pl view My::View
+   blog_bluejay_catalyst_create.pl view MyView TT
+   blog_bluejay_catalyst_create.pl view TT TT
+   blog_bluejay_catalyst_create.pl model My::Model
+   blog_bluejay_catalyst_create.pl model SomeDB DBIC::Schema MyApp::Schema create=dynamic\
+   dbi:SQLite:/tmp/my.db
+   blog_bluejay_catalyst_create.pl model AnotherDB DBIC::Schema MyApp::Schema create=static\
+   dbi:Pg:dbname=foo root 4321
+
+ See also:
+   perldoc Catalyst::Manual
+   perldoc Catalyst::Manual::Intro
+
+=head1 DESCRIPTION
+
+Create a new Catalyst Component.
+
+Existing component files are not overwritten.  If any of the component files
+to be created already exist the file will be written with a '.new' suffix.
+This behavior can be suppressed with the C<-force> option.
+
+=head1 AUTHORS
+
+Catalyst Contributors, see Catalyst.pm
+
+=head1 COPYRIGHT
+
+This library is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+__ASSET__
 assets/tt/footer.tt.html
 __ASSET__
 assets/tt/title.tt.html

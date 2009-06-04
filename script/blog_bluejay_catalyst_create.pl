@@ -38,11 +38,11 @@ pod2usage(1) unless $helper->mk_component( 'Blog::Bluejay::Catalyst', @ARGV );
 
 =head1 NAME
 
-project_jive_catalyst_create.pl - Create a new Catalyst Component
+blog_bluejay_catalyst_create.pl - Create a new Catalyst Component
 
 =head1 SYNOPSIS
 
-project_jive_catalyst_create.pl [options] model|view|controller name [helper] [options]
+blog_bluejay_catalyst_create.pl [options] model|view|controller name [helper] [options]
 
  Options:
    -force        don't create a .new file where a file to be created exists
@@ -50,15 +50,15 @@ project_jive_catalyst_create.pl [options] model|view|controller name [helper] [o
    -help         display this help and exits
 
  Examples:
-   project_jive_catalyst_create.pl controller My::Controller
-   project_jive_catalyst_create.pl -mechanize controller My::Controller
-   project_jive_catalyst_create.pl view My::View
-   project_jive_catalyst_create.pl view MyView TT
-   project_jive_catalyst_create.pl view TT TT
-   project_jive_catalyst_create.pl model My::Model
-   project_jive_catalyst_create.pl model SomeDB DBIC::Schema MyApp::Schema create=dynamic\
+   blog_bluejay_catalyst_create.pl controller My::Controller
+   blog_bluejay_catalyst_create.pl -mechanize controller My::Controller
+   blog_bluejay_catalyst_create.pl view My::View
+   blog_bluejay_catalyst_create.pl view MyView TT
+   blog_bluejay_catalyst_create.pl view TT TT
+   blog_bluejay_catalyst_create.pl model My::Model
+   blog_bluejay_catalyst_create.pl model SomeDB DBIC::Schema MyApp::Schema create=dynamic\
    dbi:SQLite:/tmp/my.db
-   project_jive_catalyst_create.pl model AnotherDB DBIC::Schema MyApp::Schema create=static\
+   blog_bluejay_catalyst_create.pl model AnotherDB DBIC::Schema MyApp::Schema create=static\
    dbi:Pg:dbname=foo root 4321
 
  See also:

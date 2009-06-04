@@ -14,7 +14,7 @@ Blog::Bluejay::Catalyst->run;
 
 =head1 NAME
 
-project_jive_catalyst_cgi.pl - Catalyst CGI
+blog_bluejay_catalyst_cgi.pl - Catalyst CGI
 
 =head1 SYNOPSIS
 

@@ -1,4 +1,8 @@
 TODO:
+    - Make sure all dependencies are up-to-date on CPAN
+    - Getopt::Long parsing on 'blog-blue server', fastcgi, etc.
+
+FUTURE:
     - Upgrade strategy:
         Blog::Bluejay::Upgrade
         Blog::Bluejay::Upgrade::App

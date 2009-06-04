@@ -20,18 +20,18 @@ print request($ARGV[0])->content . "\n";
 
 =head1 NAME
 
-project_jive_catalyst_test.pl - Catalyst Test
+blog_bluejay_catalyst_test.pl - Catalyst Test
 
 =head1 SYNOPSIS
 
-project_jive_catalyst_test.pl [options] uri
+blog_bluejay_catalyst_test.pl [options] uri
 
  Options:
    -help    display this help and exits
 
  Examples:
-   project_jive_catalyst_test.pl http://localhost/some_action
-   project_jive_catalyst_test.pl /some_action
+   blog_bluejay_catalyst_test.pl http://localhost/some_action
+   blog_bluejay_catalyst_test.pl /some_action
 
  See also:
    perldoc Catalyst::Manual

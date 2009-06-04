@@ -25,6 +25,7 @@ use Moose;
 use Blog::Bluejay::Carp;
 
 use Path::Class();
+use Class::Inspector;
 use Scalar::Util qw/weaken/;
 
 has home => qw/reader _home lazy_build 1/;
@@ -32,6 +33,9 @@ sub _build_home {
     my $self = shift;
     return $ENV{BLOG_BLUEJAY_HOME} if defined $ENV{BLOG_BLUEJAY_HOME};
     $self->guessed_home( 1 );
+    if ( Class::Inspector->loaded( 'Blog::Bluejay::Catalyst' ) ) {
+        return Blog::Bluejay::Catalyst->path_to;
+    }
     # TODO Check for .bluejay (or whatever)
     # TODO Use Find::HomeDir (or whatever)
     return Path::Class::dir( $ENV{HOME}, '.blog-bluejay' );

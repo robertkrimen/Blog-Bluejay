@@ -12,7 +12,7 @@ has bluejay => qw/is rw/;
 sub ACCEPT_CONTEXT {
     my ( $self, $ctx ) = @_;
     return $self->bluejay || do {
-        my $bluejay = Blog::Bluejay->new( home => $ENV{BLOG_BLUEJAY_HOME}, uri => URI::PathAbstract->new( $ctx->request->base ) );
+        my $bluejay = Blog::Bluejay->new( uri => URI::PathAbstract->new( $ctx->request->base ) );
         $self->bluejay( $bluejay );
     };
 }
