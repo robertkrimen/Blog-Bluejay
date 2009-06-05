@@ -20,18 +20,14 @@ sub run_script ($$) {
     Blog::Bluejay::App::Catalyst::do_setup $ctx;
 
     $ENV{BLOG_BLUEJAY_HOME} = $ctx->bluejay->home;
+    $ENV{$_} or $ENV{$_} = $ctx->bluejay->home for qw/BLOG_BLUEJAY_CATALYST_HOME/;
 
     return if $Blog::Bluejay::App::Catalyst::TEST;
-
-    $script = $ctx->bluejay->file( join '/', qw/script/, $script ); # TODO Fix this... Path::Mapper maybe?
-
-    die "Script \"$script\" does not exist" unless -f $script;
-    die "Script \"$script\" is not executable" unless -r _ && -x _;
 
     my @arguments = $ctx->arguments;
     shift @arguments;
 
-    exec( $^X => $script => @arguments );
+    exec( $^X => qw{ -w -MBlog::Bluejay::Script -e Blog::Bluejay::Script::run }, $script, @arguments );
 }
 
 package Blog::Bluejay::App::server;
@@ -41,7 +37,7 @@ use Getopt::Chain::Declare::under 'server';
 on '' => undef, sub {
     my $ctx = shift;
 
-    Blog::Bluejay::App::Catalyst::run_script $ctx, 'blog_bluejay_catalyst_server.pl';
+    Blog::Bluejay::App::Catalyst::run_script $ctx, 'server';
 };
 
 no Getopt::Chain::Declare::under;
@@ -53,7 +49,7 @@ use Getopt::Chain::Declare::under 'fastcgi';
 on '' => undef, sub {
     my $ctx = shift;
 
-    Blog::Bluejay::App::Catalyst::run_script $ctx, 'blog_bluejay_catalyst_fastcgi.pl';
+    Blog::Bluejay::App::Catalyst::run_script $ctx, 'fastcgi';
 };
 
 no Getopt::Chain::Declare::under;
