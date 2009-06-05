@@ -54,5 +54,17 @@ on '' => undef, sub {
 
 no Getopt::Chain::Declare::under;
 
+package Blog::Bluejay::App::cgi;
+
+use Getopt::Chain::Declare::under 'cgi';
+
+on '' => undef, sub {
+    my $ctx = shift;
+
+    Blog::Bluejay::App::Catalyst::run_script $ctx, 'cgi';
+};
+
+no Getopt::Chain::Declare::under;
+
 1;
 
