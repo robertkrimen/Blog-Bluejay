@@ -1,7 +1,9 @@
-package Blog::Bluejay::App::Catalyst;
+package Blog::Bluejay::App::catalyst;
 
 use strict;
 use warnings;
+
+use Getopt::Chain::Declare::under 'catalyst';
 
 our $TEST;
 
@@ -17,12 +19,12 @@ sub run_script ($$) {
     my $ctx = shift;
     my $script = shift;
 
-    Blog::Bluejay::App::Catalyst::do_setup $ctx;
+    do_setup $ctx;
 
     $ENV{BLOG_BLUEJAY_HOME} = $ctx->bluejay->home;
     $ENV{$_} or $ENV{$_} = $ctx->bluejay->home for qw/BLOG_BLUEJAY_CATALYST_HOME/;
 
-    return if $Blog::Bluejay::App::Catalyst::TEST;
+    return if $TEST;
 
     my @arguments = $ctx->arguments;
     shift @arguments;
@@ -30,41 +32,26 @@ sub run_script ($$) {
     exec( $^X => qw{ -w -MBlog::Bluejay::Script -e Blog::Bluejay::Script::run }, $script, @arguments );
 }
 
-package Blog::Bluejay::App::server;
-
-use Getopt::Chain::Declare::under 'server';
-
-on '' => undef, sub {
+on 'server' => undef, sub {
     my $ctx = shift;
 
-    Blog::Bluejay::App::Catalyst::run_script $ctx, 'server';
+    run_script $ctx, 'server';
 };
 
-no Getopt::Chain::Declare::under;
-
-package Blog::Bluejay::App::fastctgi;
-
-use Getopt::Chain::Declare::under 'fastcgi';
-
-on '' => undef, sub {
+on 'fastcgi' => undef, sub {
     my $ctx = shift;
 
-    Blog::Bluejay::App::Catalyst::run_script $ctx, 'fastcgi';
+    run_script $ctx, 'fastcgi';
 };
 
-no Getopt::Chain::Declare::under;
-
-package Blog::Bluejay::App::cgi;
-
-use Getopt::Chain::Declare::under 'cgi';
-
-on '' => undef, sub {
+on 'cgi' => undef, sub {
     my $ctx = shift;
 
-    Blog::Bluejay::App::Catalyst::run_script $ctx, 'cgi';
+    run_script $ctx, 'cgi';
 };
 
 no Getopt::Chain::Declare::under;
 
 1;
+
 

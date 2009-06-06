@@ -16,7 +16,7 @@ my ($scratch, $bluejay);
 $scratch = Directory::Scratch->new;
 $bluejay = Blog::Bluejay->new( home => $scratch->dir( qw/.blog-bluejay/ ) );
 $ENV{BLOG_BLUEJAY_HOME} = $bluejay->home;
-$Blog::Bluejay::App::Catalyst::TEST = 1;
+$Blog::Bluejay::App::catalyst::TEST = 1;
 
 ok( ! $bluejay->home_exists );
 

@@ -337,7 +337,7 @@ on 'list' => undef, sub {
     do_list $ctx;
 };
 
-require Blog::Bluejay::App::Catalyst;
+require Blog::Bluejay::App::catalyst;
 require Blog::Bluejay::App::help;
 
 on qr/.*/ => undef, sub {

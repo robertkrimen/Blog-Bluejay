@@ -1,5 +1,8 @@
 package Blog::Bluejay::App::help;
 
+use strict;
+use warnings;
+
 use Getopt::Chain::Declare::under 'help';
 
 use Text::Chomped;
