@@ -26,7 +26,7 @@ sub launch {
 
     # TODO File::Spec?
     my $lib = dir( $ENV{BLOG_BLUEJAY_CATALYST_HOME}, 'lib' );
-    unshift @INC, $lib if -d $lib;
+    unshift @INC, "$lib" if -d $lib;
 
     my $catalyst_class = $ENV{BLOG_BLUEJAY_CATALYST};
     $catalyst_class ||= 'Blog::Bluejay::Catalyst';
@@ -34,6 +34,7 @@ sub launch {
     # This is require instead of use so that the environment
     # variables can be set at runtime.
     eval "require $catalyst_class;" or die $@;
+
 
     $catalyst_class->run( @_ );
 }

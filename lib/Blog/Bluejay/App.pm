@@ -3,8 +3,6 @@ package Blog::Bluejay::App;
 use strict;
 use warnings;
 
-use Blog::Bluejay;
-
 use Data::UUID::LibUUID;
 use Carp;
 use Path::Abstract;
@@ -21,6 +19,7 @@ our $PRINT = sub { print @_ };
 package Blog::Bluejay::AppContext;
 
 use Moose;
+
 extends qw/Getopt::Chain::Context/;
 
 sub bluejay {
@@ -34,12 +33,18 @@ sub print {
 
 package Blog::Bluejay::App;
 
+sub blog_bluejay_class() { return $ENV{BLOG_BLUEJAY} || 'Blog::Bluejay' }
+
 my @bluejay;
 
 {
     my $bluejay;
     sub bluejay {
-        return $bluejay ||= Blog::Bluejay->new( @bluejay, @_ );
+        return $bluejay ||= do {
+            my $class = blog_bluejay_class;
+            eval "require $class;" or die "Couldn't require Blog::Bluejay class \"$class\": $@"; # TODO Class::Inspector
+            $class->new( @bluejay, @_ );
+        };
     }
 }
 

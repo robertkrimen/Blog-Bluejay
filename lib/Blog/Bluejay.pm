@@ -28,7 +28,7 @@ use Path::Class();
 use Class::Inspector;
 use Scalar::Util qw/weaken/;
 
-sub catalyst_class { 'Blog::Bluejay::Catalyst' }
+#sub catalyst_class { 'Blog::Bluejay::Catalyst' }
 
 has home => qw/reader _home lazy_build 1/;
 sub _build_home {

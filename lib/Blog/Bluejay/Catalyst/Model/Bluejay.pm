@@ -14,6 +14,7 @@ sub ACCEPT_CONTEXT {
     return $self->bluejay || do {
         my $bluejay = Blog::Bluejay->new( uri => URI::PathAbstract->new( $ctx->request->base ) );
         $self->bluejay( $bluejay );
+        $bluejay;
     };
 }
 
