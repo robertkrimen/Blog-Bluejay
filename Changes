@@ -1,12 +1,9 @@
 TODO:
     - Make sure all dependencies are up-to-date on CPAN
-    - Getopt::Long parsing on 'blog-bluejay server', fastcgi, etc.
-    - Blog::Blujay::DBIxSQLiteDeploy
     - Catalyst Controller loading/override
     - Integrating disqus
     - Integrating ~/pi
     - Serve post_assets
-    - Add -catalyst option
 
 FUTURE:
     - Upgrade strategy:

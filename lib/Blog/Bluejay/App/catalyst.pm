@@ -15,7 +15,7 @@ sub do_setup ($) {
     }
 }
 
-sub run_script ($$) {
+sub run_script ($$@) {
     my $ctx = shift;
     my $script = shift;
 
@@ -23,31 +23,33 @@ sub run_script ($$) {
 
     $ENV{BLOG_BLUEJAY_HOME} = $ctx->bluejay->home;
     $ENV{$_} or $ENV{$_} = $ctx->bluejay->home for qw/BLOG_BLUEJAY_CATALYST_HOME/;
+    if ( defined ( my $catalyst = $ctx->option( 'catalyst' ) ) ) {
+        $ENV{BLOG_BLUEJAY_CATALYST} = $catalyst;
+    }
 
     return if $TEST;
 
-    my @arguments = $ctx->arguments;
-    shift @arguments;
-
-    exec( $^X => qw{ -w -MBlog::Bluejay::Script -e Blog::Bluejay::Script::run }, $script, @arguments );
+    exec( $^X => qw{ -w -MBlog::Bluejay::Script -e Blog::Bluejay::Script::run }, $script, @_ );
 }
 
-on 'server' => undef, sub {
+start [qw/ catalyst=s /];
+
+on 'server --' => sub {
     my $ctx = shift;
 
-    run_script $ctx, 'server';
+    run_script $ctx, 'server', @_;
 };
 
-on 'fastcgi' => undef, sub {
+on 'fastcgi --' => sub {
     my $ctx = shift;
 
-    run_script $ctx, 'fastcgi';
+    run_script $ctx, 'fastcgi', @_;
 };
 
-on 'cgi' => undef, sub {
+on 'cgi --' => sub {
     my $ctx = shift;
 
-    run_script $ctx, 'cgi';
+    run_script $ctx, 'cgi', @_;
 };
 
 no Getopt::Chain::Declare::under;

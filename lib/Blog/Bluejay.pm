@@ -100,13 +100,12 @@ sub _build_schema_file {
 
 has deploy => qw/is ro lazy_build 1/;
 sub _build_deploy {
-    require DBIx::Deploy;
+    require Blog::Bluejay::DBIxSQLiteDeploy;
     my $self = shift;
     my $deploy;
-    $deploy = DBIx::Deploy->create(
-        engine => "SQLite",
-        database => [ $self->schema_file ],
-        create => \<<_END_,
+    $deploy = Blog::Bluejay::DBIxSQLiteDeploy->create( 
+        connection => [ $self->schema_file ],
+        schema => <<_END_,
 [% PRIMARY_KEY = "INTEGER PRIMARY KEY AUTOINCREMENT" %]
 [% KEY = "INTEGER" %]
 
@@ -132,6 +131,7 @@ CREATE TABLE post (
 _END_
     );
 };
+
 has schema => qw/is ro lazy_build 1/;
 sub _build_schema {
     require Blog::Bluejay::Schema;

@@ -11,9 +11,9 @@ AUTHOR
 BUGS
     Please report any bugs or feature requests to "bug-project-bluejay at
     rt.cpan.org", or through the web interface at
-    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Project-bluejay>. I will be
-    notified, and then you'll automatically be notified of progress on your
-    bug as I make changes.
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Project-bluejay>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
 
 SUPPORT
     You can find documentation for this module with the perldoc command.
