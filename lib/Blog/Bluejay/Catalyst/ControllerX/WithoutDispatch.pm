@@ -72,6 +72,17 @@ sub action_journal_post {
     );
 }
 
+sub action_journal_post_asset {
+    my ( $self, $ctx, $uuid, $asset) = @_;
+
+    my $post = $ctx->journal->post( $uuid );
+    $asset = $post->asset( $asset );
+    return unless $asset->render;
+
+    $ctx->serve_static_file( $asset->file );
+    return 1;
+}
+
 sub action_feed_atom {
     my ( $self, $ctx ) = @_;
 
@@ -106,6 +117,7 @@ sub action_feed_atom {
 
 sub action_not_found {
     my ( $self, $ctx ) = @_;
+
     $ctx->response->body( 'Page not found' );
     $ctx->response->status( 404 );
 }

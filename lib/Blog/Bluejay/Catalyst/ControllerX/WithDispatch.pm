@@ -42,6 +42,21 @@ sub contact :Local {
     return $self->action_contact( $ctx );
 }
 
+sub journal_post_asset :Regex('^journal/.*-([A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{12})/asset(/.*)?') {
+    my ( $self, $ctx ) = @_;
+
+    my ($uuid, $asset) = @{ $ctx->request->captures };
+
+    if ( ! $asset || $asset eq '/' ) {
+        $ctx->response->redirect( $ctx->uri_for( "journal/$uuid" ) );
+        $ctx->detach;
+    }
+
+    unless ( $self->action_journal_post_asset( $ctx, $uuid, $asset ) ) {
+        return $self->action_not_found( $ctx );
+    }
+}
+
 sub journal_post :Regex('^journal/.*-([A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{12})') {
     my ( $self, $ctx ) = @_;
 

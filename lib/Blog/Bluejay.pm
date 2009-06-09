@@ -194,6 +194,85 @@ sub BUILD {
     $self->set_uri( $given->{uri} ) if $given->{uri};
 }
 
+has inflate_map => qw/is ro required 1 lazy 1 isa HashRef/, default => sub { {} };
+my %loaded_inflator;
+
+sub inflate {
+    my $self = shift;
+    my $moniker = shift;
+
+    my $inflator = $self->inflate_map->{$moniker};
+    $inflator = join '::', ref $self, $moniker unless defined $inflator;
+
+    if ( ref $inflator eq 'CODE' ) {
+        return $inflator->( $moniker, @_ );
+    }
+    else {
+        unless ( $loaded_inflator{ $inflator } ||= Class::Inspector->loaded( $inflator ) ) {
+            eval "require $inflator;" or die $@
+        }
+        return $inflator->new( @_ );
+    }
+}
+
+{
+    my $markdown;
+    sub _markdown() {
+        require Text::MultiMarkdown;
+        return $markdown ||= Text::MultiMarkdown->new;
+    }
+}
+
+sub render_post_body {
+    my $self = shift;
+    my $body = shift;
+
+    my $post = $body->post;
+    my $header = $post->document->header;
+    my $type = $header->{type} || $header->{content_type} || ''; # TODO Make this configurable
+    $type = 'tt-markdown' if $type =~ m/text\/.*markdown/;
+
+    my $render = $body->raw;
+    if ($type =~ m/\btt\b/) {
+        my $tt = $self->tt;
+        my $ASSETS = join '/', $post->assets_dir->dir_list( -3 );
+        my $input = \$render;
+        my $output;
+        $tt->process( $input, { post => $post, ASSETS => $ASSETS }, \$output ) or die $tt->error;
+        $render = $output;
+    }
+
+    if ($type =~ m/\bmarkdown\b/) {
+        $render = _markdown->markdown( $render );
+        $render =~ s{(\n)<pre><code>(\s*)}{$1<pre class="code"><code>$2}g; # TODO Urgh, ...
+    }
+
+    return $render;
+}
+
+sub render_post_asset {
+    my $self = shift;
+    my $asset = shift;
+
+    my $file = $asset->rsc->file;
+
+    if ( -f $file && -s _ ) {
+        return \ scalar $file->slurp;
+    }
+
+    if ( $file =~ s/\.html$/\.tt.html/ &&  -f $file && -s _ ) {
+        $file = Path::Class::file $file;
+        my $tt = $self->tt;
+        my $input = \ scalar $file->slurp;
+        my $output;
+        $tt->process( $input, { post => $asset->post, asset => $asset }, \$output ) or die $tt->error;  
+        $asset->rsc->file->openw->print( $output );
+        return \ $output;
+    }
+
+    return undef;
+}
+
 =head1 AUTHOR
 
 Robert Krimen, C<< <rkrimen at cpan.org> >>

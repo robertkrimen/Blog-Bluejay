@@ -27,6 +27,7 @@ use DBICx::Modeler::Model;
 with qw/Blog::Bluejay::Modeler::Model/;
 
 use DateTimeX::Easy qw/datetime/;
+use Path::Resource;
 
 has uri => qw/is ro lazy_build 1/;
 sub _build_uri {
@@ -71,20 +72,44 @@ sub _build_local_creation {
 has body => qw/is ro lazy_build 1/;
 sub _build_body {
     my $self = shift;
-    return Blog::Bluejay::Model::Post::Body->new( post => $self );
+    return $self->bluejay->inflate( 'Model::Post::Body', post => $self );
+}
+
+sub asset_rsc {
+    my $self = shift;
+    return Path::Resource->new( uri => $self->uri->child( 'asset' ), dir => $self->assets_dir )->child( @_ );
+}
+
+sub asset {
+    my $self = shift;
+    my $rsc = $self->asset_rsc( @_ );
+    return $self->bluejay->inflate( 'Model::Post::Asset', post => $self, rsc => $rsc );
+}
+
+package Blog::Bluejay::Model::Post::Asset;
+
+use Moose;
+
+has post => qw/is ro required 1/;
+has rsc => qw/is ro required 1/;
+
+sub file {
+    return shift->rsc->file;
+}
+
+sub exists {
+    return -e shift->file;
+}
+
+has render => qw/is ro lazy_build 1/;
+sub _build_render {
+    my $self = shift;
+    return $self->post->bluejay->render_post_asset( $self );
 }
 
 package Blog::Bluejay::Model::Post::Body;
 
 use Moose;
-
-{
-    my $markdown;
-    sub _markdown() {
-        require Text::MultiMarkdown;
-        return $markdown ||= Text::MultiMarkdown->new;
-    }
-}
 
 has post => qw/is ro required 1/;
 
@@ -96,28 +121,7 @@ sub raw {
 has render => qw/is ro lazy_build 1/;
 sub _build_render {
     my $self = shift;
-
-    my $header = $self->post->document->header;
-    my $type = $header->{type} || $header->{content_type} || ''; # TODO Make this configurable
-    $type = 'tt-markdown' if $type =~ m/text\/.*markdown/;
-
-    my $render = $self->raw;
-    if ($type =~ m/\btt\b/) {
-        my $tt = $self->post->bluejay->tt;
-        my $ASSETS = join '/', $self->post->assets_dir->dir_list(-3);
-        my $input = \$render;
-        my $output;
-        $tt->process( $input, { post => $self, ASSETS => $ASSETS }, \$output ) or die $tt->error;
-        $render = $output;
-    }
-
-    if ($type =~ m/\bmarkdown\b/) {
-        $render = _markdown->markdown( $render );
-        $render =~ s{(\n)<pre><code>(\s*)}{$1<pre class="code"><code>$2}g; # TODO Urgh, ...
-    }
-
-    return $render;
+    return $self->post->bluejay->render_post_body( $self );
 }
-
 
 1;
