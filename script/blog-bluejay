@@ -3,6 +3,6 @@
 use strict;
 use warnings;
 
-(require Blog::Bluejay::App)->new->run;
+(require Blog::Bluejay::GetoptChain)->new->run;
 
 1;

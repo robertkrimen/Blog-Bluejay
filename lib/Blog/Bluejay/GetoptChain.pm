@@ -1,4 +1,4 @@
-package Blog::Bluejay::App;
+package Blog::Bluejay::GetoptChain;
 
 use strict;
 use warnings;
@@ -16,41 +16,14 @@ use Text::ASCIITable;
 
 our $PRINT = sub { print @_ };
 
-package Blog::Bluejay::AppContext;
+sub blog_bluejay_class { return $ENV{BLOG_BLUEJAY} || 'Blog::Bluejay' }
 
-use Moose;
+######
+# Do #
+######
 
-extends qw/Getopt::Chain::Context/;
-
-sub bluejay {
-    return &Blog::Bluejay::App::bluejay;
-}
-
-sub print {
-    shift;
-    $PRINT->( @_ );
-}
-
-package Blog::Bluejay::App;
-
-sub blog_bluejay_class() { return $ENV{BLOG_BLUEJAY} || 'Blog::Bluejay' }
-
-my @bluejay;
-
-{
-    my $bluejay;
-    sub bluejay {
-        return $bluejay ||= do {
-            my $class = blog_bluejay_class;
-            eval "require $class;" or die "Couldn't require Blog::Bluejay class \"$class\": $@"; # TODO Class::Inspector
-            $class->new( @bluejay, @_ );
-        };
-    }
-}
-
-sub abort(@) {
-    print join "", @_, "\n" if @_;
-    exit -1;
+sub prompt_yn ($$) {
+    return prompt Y => shift, '', shift;
 }
 
 sub folder_title {
@@ -72,131 +45,25 @@ sub folder_title {
     return ($folder, $title);
 }
 
-
-sub find ($@) {
-    my $ctx = shift;
-    my @criteria = @_;
-
-    return unless @criteria;
-
-    my $criteria = $criteria[0];
-    my ($folder, $title) = folder_title @criteria;
-
-    my ($search, $post, $count);
-    $search = $ctx->bluejay->posts(
-        [ 
-            { title => $criteria },
-            { folder => $folder, title => $title },
-            { uuid => { -like => "$criteria%" } },
-        ],
-        {}
-    );
-
-    $count = $search->count;
-    ($post) = $search->slice(0, 0) if 1 == $count;
-
-    return wantarray ? ($post, $search, $count) : $post;
-}
-
-######
-# Do #
-######
-
-sub do_list ($;$) {
-    my $ctx = shift;
-    my $search = shift;
-
-    $search = scalar $ctx->bluejay->posts unless $search;
-    my @posts = $search->search( undef, { order_by => [qw/ creation /] } )->all;
-
-    my $tb = Text::ASCIITable->new({ hide_HeadLine => 1 });
-    $tb->setCols( '', '', '' );
-    $tb->addRow( $_->uuid, $_->title, $_->folder ) for @posts;
-    $ctx->print( $tb );
-}
-
-sub do_usage ($) {
-    my $ctx = shift;
-    Blog::Bluejay::App::help::do_usage $ctx;
-}
-
-sub do_new ($$$) {
-    my ($ctx, $folder, $title) = @_;
-
-    my $document = $ctx->bluejay->cabinet->create;
-    $document->header->{title} = $title;
-    $document->header->{folder} = $folder;
-    $document->edit;
-    return $document;
-}
-
-sub do_find ($@) {
-    my $ctx = shift;
-    my @criteria = @_;
-
-    unless (@criteria) {
-        do_list $ctx;
-        return;
-    }
-
-    my ($post, $search, $count) = find $ctx, @criteria;
-
-    abort "No post found matching your criteria" unless $count;
-
-    choose $search if $count > 1;
-
-    return $post;
-}
-
-sub do_choose ($$) {
-    my $ctx = shift;
-    my $search = shift;
-
-    $ctx->print( "Too many posts found matching your criteria\n" );
-
-    list $search;
-}
-
-sub prompt_yn ($$) {
-    return prompt Y => shift, '', shift;
-}
-
-sub do_no_command ($) {
-    my $ctx = shift;
-
-    if ( bluejay->home_exists ) {
-        do_usage $ctx;
-        do_list $ctx;
-    }
-    else {
-        &Blog::Bluejay::App::help::do_synopsis( $ctx );
-    }
-
-    exit -1;
-}
-
 #######
 # Run #
 #######
 
 use Getopt::Chain::Declare;
 
-context 'Blog::Bluejay::AppContext';
+context 'Blog::Bluejay::GetoptChain::Context';
+require Blog::Bluejay::GetoptChain::Context;
 
 start [qw/ home=s /], sub {
     my $ctx = shift;
 
     if (defined ( my $home = $ctx->option( 'home' ) ) ) {
-        push @bluejay, home => $home;
+        $ctx->stash(
+            bluejay_home => $home,
+        );
     }
 
-    $ctx->stash(
-        bluejay => bluejay,
-    );
-
-    if ( $ctx->last ) {
-        do_no_command $ctx;
-    }
+    $ctx->error_no_command if $ctx->last;
 };
 
 on 'setup *' => undef, sub {
@@ -296,18 +163,18 @@ on 'publish' => undef, sub {
 on 'edit *' => undef, sub {
     my $ctx = shift;
 
-    return do_list $ctx unless @_;
+    $ctx->error_no_post_criteria unless @_;
 
-    my ($post, $search, $count) = find $ctx, @_;
+    my ($post, $search, $count) = $ctx->find_post( @_ );
 
     if ($post) {
         $post->edit;
     }
     else {
-        return do_choose $ctx, $search if $count > 1;
+        $ctx->error_too_many_posts( $search ) if $count > 1;
         return unless my ($folder, $title) = folder_title @_;
         if (prompt_yn "Post \"$title\" not found. Do you want to start it? y/N", 'Y') {
-            my $post = do_new $ctx, $folder, $title;
+            my $post = $ctx->create_post( $title );
         }
     }
 };
@@ -338,26 +205,16 @@ on 'status' => undef, sub {
 
 on 'list' => undef, sub {
     my $ctx = shift;
-
-    do_list $ctx;
+    $ctx->list_posts;
 };
 
-require Blog::Bluejay::App::catalyst;
-require Blog::Bluejay::App::help;
+require Blog::Bluejay::GetoptChain::catalyst;
+require Blog::Bluejay::GetoptChain::help;
 
 on qr/.*/ => undef, sub {
     my $ctx = shift;
-    my $command = $ctx->command;
-
-    if ($command) {
-        $ctx->print( "blog-bluejay: Unknown command \"$command\"\n\n" );
-    }
-
-    do_usage $ctx;
-    do_list $ctx;
-    exit -1;
+    $ctx->error_unknown_command;
 };
-
 
 no Getopt::Chain::Declare;
 

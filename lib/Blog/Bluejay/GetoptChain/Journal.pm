@@ -1,4 +1,4 @@
-package Blog::Bluejay::App::Journal;
+package Blog::Bluejay::GetoptChain::Journal;
 
 use strict;
 use warnings;
