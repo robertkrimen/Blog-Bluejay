@@ -3,6 +3,7 @@ package Blog::Bluejay::GetoptChain::Context;
 use Moose;
 
 use Text::Chomped;
+use Text::ASCIITable;
 
 extends qw/Getopt::Chain::Context/;
 

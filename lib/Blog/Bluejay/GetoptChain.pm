@@ -3,16 +3,15 @@ package Blog::Bluejay::GetoptChain;
 use strict;
 use warnings;
 
-use Data::UUID::LibUUID;
-use Carp;
-use Path::Abstract;
-use DateTime;
+#use Data::UUID::LibUUID;
+#use Carp;
+#use Path::Abstract;
+#use DateTime;
 use Getopt::Chain;
 use Document::TriPart::Cabinet::UUID;
 use Term::Prompt;
-use File::Find();
 local $Term::Prompt::MULTILINE_INDENT = undef;
-use Text::ASCIITable;
+use File::Find();
 
 our $PRINT = sub { print @_ };
 
