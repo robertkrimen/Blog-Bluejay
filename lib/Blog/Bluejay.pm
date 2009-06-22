@@ -118,15 +118,18 @@ CREATE TABLE post (
 
     id                  [% PRIMARY_KEY %],
     uuid                TEXT NOT NULL,
-    creation        DATE NOT NULL,
-    modification            DATE,
+    luid                TEXT NULL,
+    creation            DATE NOT NULL,
+    modification        DATE,
     header              TEXT NULL,
 
-    folder              TEXT,
     title               TEXT,
-    abstract            TEXT,
+    description         TEXT,
+    excerpt             TEXT,
+    status              TEXT,
 
-    UNIQUE (uuid)
+    UNIQUE (uuid),
+    UNIQUE (luid)
 );
 _END_
     );
@@ -186,6 +189,13 @@ sub _build_layout {
     my $layout = Blog::Bluejay::Layout->new( bluejay => $self );
     $layout->parse( $self->config->{page} || {} ); # TODO Should this be ->{layout} ?
     return $layout;
+}
+
+has luid => qw/is ro lazy_build 1/;
+sub _build_luid {
+    require Data::LUID::Table;
+    my $self = shift;
+    return Data::LUID::Table->new( path => $self->dir( 'run/luid' ) );
 }
 
 sub BUILD {

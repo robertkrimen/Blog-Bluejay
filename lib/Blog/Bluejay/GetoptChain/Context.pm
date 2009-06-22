@@ -3,7 +3,9 @@ package Blog::Bluejay::GetoptChain::Context;
 use Moose;
 
 use Text::Chomped;
-use Text::ASCIITable;
+#use Text::ASCIITable;
+#use Text::SimpleTable;
+use Text::TabularDisplay;
 
 extends qw/Getopt::Chain::Context/;
 
@@ -51,12 +53,11 @@ sub show_usage {
     $ctx->print( <<_END_ );
 @{[ $ctx->usage ]}
 
-        setup
-        edit
-        publish
-
-        list 
-        assets <key>
+        catalyst    Start a Catalyst service
+        edit        Edit an existing post or create a new post
+        post        Show information about a post
+        posts       Show a list of posts
+        status      Show blog status
 
 _END_
 }
@@ -76,15 +77,19 @@ sub show_synopsis {
 
     Edit a post with:
     
-        blog-bluejay edit <uuid>
+        blog-bluejay edit <title|uuid|luid>
 
-    Launch your blog server with:
+    To show a list of posts:
 
-        blog-bluejay server
+        blog-bluejay posts
+
+    Launch the Catalyst server for your blog:
+
+        blog-bluejay catalyst server
 
     To see this help again:
 
-        blog-bluejay help synopsis
+        blog-bluejay synopsis
 
     For more help:
 
@@ -118,8 +123,8 @@ sub find_post {
     my ($search, $post, $count);
     $search = $ctx->bluejay->posts(
         [ 
-#            { title => $criteria },
-#            { folder => $folder, title => $title },
+            { title => join ' ', @criteria },
+            { luid => $criteria },
             { uuid => { -like => "$criteria%" } },
         ],
         {}
@@ -138,10 +143,14 @@ sub list_posts {
     $search = scalar $ctx->bluejay->posts unless $search;
     my @posts = $search->search( undef, { order_by => [qw/ creation /] } )->all;
 
-    my $tb = Text::ASCIITable->new({ hide_HeadLine => 1 });
-    $tb->setCols( '', '', '' );
-    $tb->addRow( $_->uuid, $_->title, $_->folder ) for @posts;
-    $ctx->print( $tb );
+#    my $tb = Text::ASCIITable->new({ hide_HeadLine => 1 });
+#    $tb->setCols( '', '', );
+#    $tb->addRow( $_->luid, $_->title, ) for @posts;
+#    $ctx->print( $tb );
+
+    my $tb = Text::TabularDisplay->new;
+    $tb->add( $_->luid, $_->title, ) for @posts;
+    $ctx->print( $tb->render, "\n" );
 }
 
 #########

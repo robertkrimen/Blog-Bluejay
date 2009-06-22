@@ -1,4 +1,4 @@
-.PHONY: all test clean distclean dist pack assets
+.PHONY: all test clean distclean dist pack assets bb-reset bb-reset-import
 
 all: test
 
@@ -27,3 +27,9 @@ pack:
 
 assets:
 	./script/assets2source > lib/Blog/Bluejay/Assets/Data/Source.pm
+
+bb-reset:
+	rm -rf ~/.blog-bluejay/run
+
+bb-reset-import: bb-reset
+	./script/legacy-b9-import

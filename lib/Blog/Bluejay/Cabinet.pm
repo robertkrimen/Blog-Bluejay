@@ -14,6 +14,45 @@ use Moose;
 
 extends qw/Document::TriPart::Cabinet::Document/;
 
+has loaded => qw/is rw/;
+
+after load => sub {
+    my $self = shift;
+    $self->loaded( 1 );
+};
+
+sub luid {
+    my $self = shift;
+    return $self->header->{luid} unless @_;
+    $self->header->{luid} = shift;
+}
+
+#before edit => sub {
+#    my $self = shift;
+
+#    for (qw/ luid /) {
+#        exists $self->header->{$_} or $self->header->{$_} = $self->$_;
+#    }
+#};
+
+before save => sub {
+    my $self = shift;
+
+    my $luid;
+    if ( $self->loaded || exists $self->header->{luid} ) {
+        $luid = $self->luid;
+    }
+    else {
+        $luid = $self->cabinet->bluejay->luid->next;
+    }
+
+    if ( defined $luid ) {
+        $self->cabinet->bluejay->luid->take( $luid );
+    }
+
+    $self->luid( $luid );
+};
+
 after save => sub {
     my $self = shift;
 
@@ -24,10 +63,12 @@ after save => sub {
 
     $self->cabinet->bluejay->model( 'Post' )->update_or_create( {
         uuid => $self->uuid,
+        luid => $self->luid,
         creation => $creation,
         modification => $modification,
         title => $header->{title},
-        folder => $header->{folder},
+# TODO description, excerpt
+        status => $header->{status},
     } );
 };
 

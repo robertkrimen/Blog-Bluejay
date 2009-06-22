@@ -97,11 +97,13 @@ sub action_feed_atom {
 
     my $journal = $ctx->journal;
 
+    my @posts = $journal->published;
+
     $ctx->stash(
-        posts => [ $journal->posts ],
+        posts => \@posts,
     );
 
-    for my $post ($journal->posts) {
+    for my $post (@posts) {
         $feed->add_entry(
             title     => $post->title,
             link      => $post->uri,

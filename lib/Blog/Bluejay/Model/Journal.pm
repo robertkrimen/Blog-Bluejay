@@ -13,6 +13,11 @@ sub posts {
     return $self->bluejay->model( 'Post' )->search( @search );
 }
 
+sub published {
+    my $self = shift;
+    return $self->posts->search( { status => 'published' } );
+}
+
 sub post {
     my $self = shift;
     my $uuid = shift;

@@ -155,10 +155,7 @@ To control your blog, you can either setup the following script:
 _END_
 };
 
-on 'publish' => undef, sub {
-    my $ctx = shift;
-};
-
+rewrite qr/^post-edit$/ => sub { 'edit' };
 on 'edit *' => undef, sub {
     my $ctx = shift;
 
@@ -178,7 +175,7 @@ on 'edit *' => undef, sub {
     }
 };
 
-on 'load' => undef, sub {
+on 'posts-reload' => undef, sub {
     my $ctx = shift;
 
     $ctx->bluejay->dir( 'assets/document' )->recurse(callback => sub {

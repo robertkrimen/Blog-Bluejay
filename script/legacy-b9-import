@@ -7,6 +7,8 @@ use Blog::Bluejay;
 use Path::Class;
 use Document::TriPart::Cabinet;
 
+die "Don't have an environment... did you source ./script/env?\n" unless $ENV{BLOG_BLUEJAY};
+
 my $bluejay = Blog::Bluejay->new;
 my $journal = $bluejay->journal;
 my $cabinet = $bluejay->cabinet;
@@ -30,8 +32,11 @@ for (grep { -f $_ } $dir->children) {
 #    my $document = Document::TriPart::Cabinet::Document->new( uuid => $uuid,  );
     my $document = $cabinet->create( uuid => $uuid );
     $document->_tp->read( $legacy_document );
+    my $status = delete $document->header->{folder};
+    $status = $status eq 'journal' ? 'published' : undef if $status;
     $document->header->{creation} = delete $document->header->{cdtime};
     $document->header->{modification} = delete $document->header->{mdtime} if exists $document->header->{mdtime};
+    $document->header->{status} = $status if defined $status;
     $document->save;
 
 #    $cabinet->save( $document );

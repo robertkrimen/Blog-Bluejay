@@ -137,7 +137,7 @@ sub render {
     $catalyst->stash(
         page => $self,
         template => 'page/posts.tt.html',
-        posts => [ $self->bluejay->journal->posts ],
+        posts => [ $self->bluejay->journal->published ],
     );
 }
 

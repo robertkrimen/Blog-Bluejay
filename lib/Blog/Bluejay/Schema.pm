@@ -21,7 +21,8 @@ use JSON;
 __PACKAGE__->load_components(qw/InflateColumn::DateTime PK::Auto Core/);
 __PACKAGE__->table('post');
 __PACKAGE__->add_columns(
-    qw/ id uuid folder title abstract /,
+    qw/ id uuid luid /,
+    qw/ title description excerpt status /,
     qw/ creation modification /,
 );
 #__PACKAGE__->add_columns(creation => { data_type => 'datetime' }, modification => { data_type => 'datetime' });

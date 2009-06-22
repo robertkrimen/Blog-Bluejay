@@ -1,0 +1,10 @@
+#!/bin/sh
+
+export BLOG_BLUEJAY="Blog::Bluejay"
+export BLOG_BLUEJAY_HOME="$HOME/.blog-bluejay"
+
+#cat <<_END_
+#export BLOG_BLUEJAY="Project::b9"
+#export BLOG_BLUEJAY_CATALYST="Project::b9::Catalyst"
+#export BLOG_BLUEJAY_HOME="/home/rob/develop/Project-b9-bluejay"
+#_END_
