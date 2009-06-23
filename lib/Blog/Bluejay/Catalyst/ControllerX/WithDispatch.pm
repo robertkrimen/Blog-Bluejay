@@ -91,7 +91,7 @@ sub journal_post_asset :Chained('journal_post') :PathPart('asset') {
 #    return $self->action_journal_post( $ctx, $uuid );
 #}
 
-sub feed_atom :Path('feed/atom') {
+sub feed_atom :Regex('(?:journal/)?feed/atom') {
     my ( $self, $ctx ) = @_;
 
     return $self->action_feed_atom( $ctx );

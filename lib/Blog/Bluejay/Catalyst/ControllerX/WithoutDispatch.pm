@@ -110,7 +110,7 @@ sub action_feed_atom {
             title     => $post->title,
             link      => $post->uri,
             id        => 'urn:uuid:' . $post->uuid,
-            summary   => '$description',
+#            summary   => '$description',
             updated   => $post->local_creation,
         );
     }

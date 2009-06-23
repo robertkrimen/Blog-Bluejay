@@ -143,10 +143,11 @@ sub list_posts {
     $search = scalar $ctx->bluejay->posts unless $search;
     my @posts = $search->search( undef, { order_by => [qw/ creation /] } )->all;
 
-#    my $tb = Text::ASCIITable->new({ hide_HeadLine => 1 });
-#    $tb->setCols( '', '', );
-#    $tb->addRow( $_->luid, $_->title, ) for @posts;
-#    $ctx->print( $tb );
+    my $count = @posts;
+
+    $ctx->print( $count, " post", ($count == 1 ? '' : 's'), "\n" );
+
+    return unless @posts;
 
     my $tb = Text::TabularDisplay->new;
     $tb->add( $_->luid, $_->title, ) for @posts;

@@ -175,8 +175,12 @@ on 'edit *' => undef, sub {
     }
 };
 
-on 'posts-reload' => undef, sub {
+on 'reset' => undef, sub {
     my $ctx = shift;
+
+    die "Already connected to database\n" if $ctx->bluejay->{schema};
+
+    $ctx->bluejay->schema_file->remove;
 
     $ctx->bluejay->dir( 'assets/document' )->recurse(callback => sub {
         my $file = shift;
@@ -187,6 +191,8 @@ on 'posts-reload' => undef, sub {
         my $document = $ctx->bluejay->cabinet->load( $uuid );
         $document->save;
     });
+
+    $ctx->list_posts;
 };
 
 on 'status' => undef, sub {
@@ -199,7 +205,7 @@ on 'status' => undef, sub {
     $ctx->print( "\n" );
 };
 
-on 'list' => undef, sub {
+on [ [qw/ list posts/ ] ] => sub {
     my $ctx = shift;
     $ctx->list_posts;
 };

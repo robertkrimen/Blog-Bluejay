@@ -38,17 +38,16 @@ sub luid {
 before save => sub {
     my $self = shift;
 
-    my $luid;
-    if ( $self->loaded || exists $self->header->{luid} ) {
-        $luid = $self->luid;
-    }
-    else {
-        $luid = $self->cabinet->bluejay->luid->next;
-    }
+#    if ( $self->loaded || $self->header->{luid} ) {
+#        $luid = $self->luid;
+#    }
+#    else {
+#        $luid = $self->cabinet->bluejay->luid->next;
+#    }
 
-    if ( defined $luid ) {
-        $self->cabinet->bluejay->luid->take( $luid );
-    }
+    my $luid = $self->luid;
+    $luid = $self->cabinet->bluejay->luid->next unless defined $luid && length $luid;
+    $self->cabinet->bluejay->luid->take( $luid );
 
     $self->luid( $luid );
 };
