@@ -65,6 +65,7 @@ sub action_contact {
 sub action_journal_post {
     my ( $self, $ctx, $uuid ) = @_;
 
+    $uuid = $ctx->stash->{uuid} unless defined $uuid;
     my $post = $ctx->journal->post( $uuid );
     $ctx->stash(
         template => 'page/post.tt.html',
@@ -75,6 +76,7 @@ sub action_journal_post {
 sub action_journal_post_asset {
     my ( $self, $ctx, $uuid, $asset) = @_;
 
+    $uuid = $ctx->stash->{uuid} unless defined $uuid;
     my $post = $ctx->journal->post( $uuid );
     $asset = $post->asset( $asset );
     return unless $asset->render;

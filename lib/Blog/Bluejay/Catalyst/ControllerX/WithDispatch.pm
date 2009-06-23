@@ -11,6 +11,7 @@ use jQuery::Loader;
 use File::Assets;
 use Blog::Bluejay;
 use Text::Lorem::More;
+use Document::TriPart::Cabinet;
 
 sub auto :Private {
     my ( $self, $ctx ) = @_;
@@ -42,28 +43,53 @@ sub contact :Local {
     return $self->action_contact( $ctx );
 }
 
-sub journal_post_asset :Regex('^journal/.*-([A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{12})/asset(/.*)?') {
+sub journal_post :Chained('/') :PathPart('journal') :CaptureArgs(1) {
+    my ( $self, $ctx, $post ) = @_;
+
+    if ( $post =~ m/-($Document::TriPart::Cabinet::UUID::re)$/ ) {
+        $ctx->stash( uuid => $1 );
+    }
+    else {
+        die "Don't understand $post";
+    }
+}
+
+sub journal_post_ :Chained('journal_post') :PathPart('') :Args(0) {
     my ( $self, $ctx ) = @_;
 
-    my ($uuid, $asset) = @{ $ctx->request->captures };
+    return $self->action_journal_post( $ctx );
+}
 
-    if ( ! $asset || $asset eq '/' ) {
-        $ctx->response->redirect( $ctx->uri_for( "journal/$uuid" ) );
-        $ctx->detach;
-    }
+sub journal_post_asset :Chained('journal_post') :PathPart('asset') {
+    my ( $self, $ctx, $asset ) = @_;
 
-    unless ( $self->action_journal_post_asset( $ctx, $uuid, $asset ) ) {
+    unless ( $self->action_journal_post_asset( $ctx, undef, $asset ) ) {
         return $self->action_not_found( $ctx );
     }
 }
 
-sub journal_post :Regex('^journal/.*-([A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{12})/?$') {
-    my ( $self, $ctx ) = @_;
+#sub journal_post_asset :Regex('^journal/.*-([A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{12})/asset(/.*)?') {
+#    my ( $self, $ctx ) = @_;
 
-    my ($uuid) = @{ $ctx->request->captures };
+#    my ($uuid, $asset) = @{ $ctx->request->captures };
 
-    return $self->action_journal_post( $ctx, $uuid );
-}
+#    if ( ! $asset || $asset eq '/' ) {
+#        $ctx->response->redirect( $ctx->uri_for( "journal/$uuid" ) );
+#        $ctx->detach;
+#    }
+
+#    unless ( $self->action_journal_post_asset( $ctx, $uuid, $asset ) ) {
+#        return $self->action_not_found( $ctx );
+#    }
+#}
+
+#sub journal_post :Regex('^journal/.*-([A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{12})/?$') {
+#    my ( $self, $ctx ) = @_;
+
+#    my ($uuid) = @{ $ctx->request->captures };
+
+#    return $self->action_journal_post( $ctx, $uuid );
+#}
 
 sub feed_atom :Path('feed/atom') {
     my ( $self, $ctx ) = @_;
