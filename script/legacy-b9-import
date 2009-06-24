@@ -3,13 +3,24 @@
 use strict;
 use warnings;
 
-use Blog::Bluejay;
 use Path::Class;
 use Document::TriPart::Cabinet;
 
-die "Don't have an environment... did you source ./script/env?\n" unless $ENV{BLOG_BLUEJAY};
+#die "Don't have an environment... did you source ./script/env?\n" unless $ENV{BLOG_BLUEJAY};
 
-my $bluejay = Blog::Bluejay->new;
+my $class;
+my @bluejay;
+eval {
+    require Project::b9::FindAppHome;
+    require Project::b9::Environment;
+    $class = 'Project::b9';
+    push @bluejay, home => Project::b9::FindAppHome->find;
+};
+$class ||= 'Blog::Bluejay';
+
+eval "require $class;" or die $@;
+
+my $bluejay = $class->new( @bluejay );
 my $journal = $bluejay->journal;
 my $cabinet = $bluejay->cabinet;
 

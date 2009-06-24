@@ -35,12 +35,16 @@ sub _build_home {
     my $self = shift;
     return $ENV{BLOG_BLUEJAY_HOME} if defined $ENV{BLOG_BLUEJAY_HOME};
     $self->guessed_home( 1 );
-#    if ( Class::Inspector->loaded( 'Blog::Bluejay::Catalyst' ) ) {
-#        return Blog::Bluejay::Catalyst->path_to;
-#    }
-    # TODO Check for .bluejay (or whatever)
-    # TODO Use Find::HomeDir (or whatever)
-    return Path::Class::dir( $ENV{HOME}, '.blog-bluejay' );
+    if (ref $self eq 'Blog::Bluejay') {
+        # TODO Check for .bluejay (or whatever)
+        # TODO Use Find::HomeDir (or whatever)
+        return Path::Class::dir( $ENV{HOME}, '.blog-bluejay' );
+    }
+    else {
+        require Blog::Bluejay::FindAppHome;
+        my $home = Blog::Bluejay::FindAppHome->find( ref $self );
+        return $home if $home;
+    }
 }
 has guessed_home => qw/is rw isa Bool default 0/; # TODO Invalid if called before ->home
 sub home_exists {
