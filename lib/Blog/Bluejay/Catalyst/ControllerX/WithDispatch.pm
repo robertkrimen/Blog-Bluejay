@@ -31,22 +31,22 @@ sub journal :Local {
     return $self->action_journal( $ctx );
 }
 
-sub about :Local {
-    my ( $self, $ctx ) = @_;
+#sub about :Local {
+#    my ( $self, $ctx ) = @_;
 
-    return $self->action_about( $ctx );
-}
+#    return $self->action_about( $ctx );
+#}
 
-sub contact :Local {
-    my ( $self, $ctx ) = @_;
+#sub contact :Local {
+#    my ( $self, $ctx ) = @_;
 
-    return $self->action_contact( $ctx );
-}
+#    return $self->action_contact( $ctx );
+#}
 
 sub journal_post :Chained('/') :PathPart('journal') :CaptureArgs(1) {
     my ( $self, $ctx, $post ) = @_;
 
-    if ( $post =~ m/-($Document::TriPart::Cabinet::UUID::re)$/ ) {
+    if ( $post =~ m/-?($Document::TriPart::Cabinet::UUID::re)$/ ) {
         $ctx->stash( uuid => $1 );
     }
     else {
@@ -60,7 +60,7 @@ sub journal_post_ :Chained('journal_post') :PathPart('') :Args(0) {
     return $self->action_journal_post( $ctx );
 }
 
-sub journal_post_asset :Chained('journal_post') :PathPart('asset') {
+sub journal_post_asset :Chained('journal_post') :PathPart('assets') {
     my ( $self, $ctx, $asset ) = @_;
 
     unless ( $self->action_journal_post_asset( $ctx, undef, $asset ) ) {
@@ -94,19 +94,26 @@ sub journal_post_asset :Chained('journal_post') :PathPart('asset') {
 sub feed_atom :Regex('(?:journal/)?feed/atom') {
     my ( $self, $ctx ) = @_;
 
-    return $self->action_feed_atom( $ctx );
+    $self->action_feed_atom( $ctx );
 }
 
 sub default :Path {
     my ( $self, $ctx ) = @_;
 
-    return $self->action_not_found( $ctx );
+    my $path = $ctx->request->path;
+
+    if ( my $page = $ctx->bluejay->page( $path ) ) {
+        $self->action_page( $ctx, $page );
+    }
+    else {
+        $self->action_not_found( $ctx );
+    }
 }
 
 sub not_found :Private {
     my ( $self, $ctx ) = @_;
 
-    return $self->action_not_found( $ctx );
+    $self->action_not_found( $ctx );
 }
 
 sub end : ActionClass('RenderView') {}

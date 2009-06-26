@@ -77,7 +77,7 @@ sub _build_body {
 
 sub asset_rsc {
     my $self = shift;
-    return Path::Resource->new( uri => $self->uri->child( 'asset' ), dir => $self->assets_dir )->child( @_ );
+    return Path::Resource->new( uri => $self->uri->child( 'assets' ), dir => $self->assets_dir )->child( @_ );
 }
 
 sub asset {

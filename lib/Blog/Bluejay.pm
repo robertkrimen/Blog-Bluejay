@@ -195,6 +195,52 @@ sub _build_layout {
     return $layout;
 }
 
+has page_catalog => qw/is ro lazy_build 1/, init_arg => undef;
+sub _build_page_catalog {
+    require Blog::Bluejay::PageCatalog;
+    my $self = shift;
+
+    my $catalog = Blog::Bluejay::PageCatalog->new( bluejay => $self );
+
+    my $page_catalog_default = $self->page_catalog_default;
+    my $page_catalog_given = $self->config->{page} || {};
+
+    my @page_order;
+    for my $label (@{ $self->page_order }) {
+        my ( @entry, $set );
+        $set = 1 if $label eq 'journal';
+        if ( my $default_entry = $page_catalog_default->{$label} ) {
+            push @entry, %$default_entry;
+        }
+        if ( my $given_entry = delete $page_catalog_given->{$label} ) {
+            $set = 1;
+            push @entry, %$given_entry;
+        }
+        if ( @entry or $set ) {
+            push @page_order, $label;
+            $catalog->set( $label => { @entry } );
+        }
+    }
+    $self->page_order( \@page_order );
+    return $catalog;
+}
+
+sub page {
+    my $self = shift;
+    my $path = shift;
+    return $self->page_catalog->get( $path );
+}
+
+has page_catalog_default => qw/is ro lazy_build 1 isa HashRef/;
+sub _build_page_catalog_default {
+    return { journal => {} };
+}
+
+has page_order => qw/is rw lazy_build 1 isa ArrayRef/;
+sub _build_page_order {
+    return [qw/ home journal about contact /];
+}
+
 has luid => qw/is ro lazy_build 1/;
 sub _build_luid {
     require Data::LUID::Table;

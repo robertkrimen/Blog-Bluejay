@@ -27,40 +27,64 @@ sub prepare {
     return 1;
 }
 
+sub action_page {
+    my ( $self, $ctx, $page ) = @_;
+
+    unless ( ref $page ) {
+        my $path = $page;
+        $page = $ctx->bluejay->page( $path ) or die "Couldn't find page for path \"$path\"";
+    }
+
+    $ctx->stash(
+        page => $page,
+        template => $page->template,
+    );
+}
+
 sub action_index {
     my ( $self, $ctx ) = @_;
 
-    if ( my $home = $ctx->layout->home ) {
-        $self->action_home( $ctx );
+    if ( my $page = $ctx->bluejay->page( 'home' ) ) {
+        $self->action_page( $ctx, $page );
     }
     else {
         $self->action_journal( $ctx );
     }
 }
 
-sub action_home {
-    my ( $self, $ctx ) = @_;
-
-    $ctx->layout->home->render( $ctx );
-}
-
 sub action_journal {
     my ( $self, $ctx ) = @_;
 
-    $ctx->layout->journal->render( $ctx );
+    $self->action_page( $ctx, 'journal' );
+    $ctx->stash(
+        posts => [ $ctx->bluejay->journal->published ],
+    );
+#    $ctx->layout->journal->render( $ctx );
 }
 
-sub action_about {
-    my ( $self, $ctx ) = @_;
+#sub action_home {
+#    my ( $self, $ctx ) = @_;
 
-    $ctx->layout->about->render( $ctx );
-}
+#    $ctx->layout->home->render( $ctx );
+#}
 
-sub action_contact {
-    my ( $self, $ctx ) = @_;
+#sub action_journal {
+#    my ( $self, $ctx ) = @_;
 
-    $ctx->layout->contact->render( $ctx );
-}
+#    $ctx->layout->journal->render( $ctx );
+#}
+
+#sub action_about {
+#    my ( $self, $ctx ) = @_;
+
+#    $ctx->layout->about->render( $ctx );
+#}
+
+#sub action_contact {
+#    my ( $self, $ctx ) = @_;
+
+#    $ctx->layout->contact->render( $ctx );
+#}
 
 sub action_journal_post {
     my ( $self, $ctx, $uuid ) = @_;
