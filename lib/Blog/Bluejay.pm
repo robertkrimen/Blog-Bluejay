@@ -283,6 +283,12 @@ sub inflate {
     }
 }
 
+has index_is_journal => qw/is ro lazy_build 1/;
+sub _build_index_is_journal {
+    my $self = shift;
+    return $self->page( 'home' ) ? 0 : 1;
+} 
+
 sub render_post_body {
     my $self = shift;
     my $body = shift;

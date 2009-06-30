@@ -68,6 +68,44 @@ sub journal_post_asset :Chained('journal_post') :PathPart('assets') {
     }
 }
 
+sub index_year :Regex('^(\d{4})(?:/|$)') {
+    my ( $self, $ctx ) = @_;
+
+    if ( $ctx->bluejay->index_is_journal ) {
+        $ctx->forward( 'journal_year' );
+    }
+    else {
+        $ctx->forward( 'default' );
+    }
+}
+
+sub index_month :Regex('^(\d{4})/(\d{1,2})(?:/|$)') {
+    my ( $self, $ctx ) = @_;
+
+    if ( $ctx->bluejay->index_is_journal ) {
+        $ctx->forward( 'journal_month' );
+    }
+    else {
+        $ctx->forward( 'default' );
+    }
+}
+
+sub journal_year :Regex('^journal/(\d{4})(?:/|$)') {
+    my ( $self, $ctx ) = @_;
+
+    my ($year) = @{ $ctx->request->captures };
+
+    $self->action_journal_year( $ctx, "$year" );
+}
+
+sub journal_month :Regex('^journal/(\d{4})/(\d{1,2})(?:/|$)') {
+    my ( $self, $ctx ) = @_;
+
+    my ($year, $month) = @{ $ctx->request->captures };
+
+    $self->action_journal_month( $ctx, "$year-$month-01" );
+}
+
 #sub journal_post_asset :Regex('^journal/.*-([A-Fa-f\d]{8}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{4}-[A-Fa-f\d]{12})/asset(/.*)?') {
 #    my ( $self, $ctx ) = @_;
 

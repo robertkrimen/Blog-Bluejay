@@ -6,9 +6,13 @@ use warnings;
 use parent qw/Catalyst::Controller/;
 
 use Moose;
+use Blog::Bluejay::Carp;
+
+
 use YUI::Loader;
 use jQuery::Loader;
 use File::Assets;
+use DateTimeX::Easy qw/datetime/;
 
 sub prepare {
     my ( $self, $ctx ) = @_;
@@ -44,11 +48,11 @@ sub action_page {
 sub action_index {
     my ( $self, $ctx ) = @_;
 
-    if ( my $page = $ctx->bluejay->page( 'home' ) ) {
-        $self->action_page( $ctx, $page );
+    if ( $ctx->bluejay->index_is_journal ) {
+        $self->action_journal( $ctx );
     }
     else {
-        $self->action_journal( $ctx );
+        $self->action_page( $ctx, 'home' );
     }
 }
 
@@ -59,32 +63,27 @@ sub action_journal {
     $ctx->stash(
         posts => [ $ctx->bluejay->journal->published ],
     );
-#    $ctx->layout->journal->render( $ctx );
 }
 
-#sub action_home {
-#    my ( $self, $ctx ) = @_;
+sub action_journal_year {
+    my ( $self, $ctx, $year ) = @_;
 
-#    $ctx->layout->home->render( $ctx );
-#}
+    $self->action_page( $ctx, 'journal' );
+    $ctx->stash(
+        posts => [ $ctx->bluejay->journal->published->search( { creation => { -like => "$year-%" } } ) ],
+    );
+}
 
-#sub action_journal {
-#    my ( $self, $ctx ) = @_;
+sub action_journal_month {
+    my ( $self, $ctx, $month ) = @_;
 
-#    $ctx->layout->journal->render( $ctx );
-#}
+    $month = datetime $_ or croak "Don't understand month $_" for $month;
 
-#sub action_about {
-#    my ( $self, $ctx ) = @_;
-
-#    $ctx->layout->about->render( $ctx );
-#}
-
-#sub action_contact {
-#    my ( $self, $ctx ) = @_;
-
-#    $ctx->layout->contact->render( $ctx );
-#}
+    $self->action_page( $ctx, 'journal' );
+    $ctx->stash(
+        posts => [ $ctx->bluejay->journal->published->search( { creation => { -like => $month->strftime( '%Y-%m-%%' ) } } ) ],
+    );
+}
 
 sub action_journal_post {
     my ( $self, $ctx, $uuid ) = @_;
@@ -108,6 +107,12 @@ sub action_journal_post_asset {
     $ctx->serve_static_file( $asset->file );
     return 1;
 }
+
+#sub action_journal_month {
+#    my ( $self, $ctx, $month ) = @_;
+
+#    $ctx->response->body( $month );
+#}
 
 sub action_feed_atom {
     my ( $self, $ctx ) = @_;
